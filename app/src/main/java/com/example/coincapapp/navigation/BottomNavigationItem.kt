@@ -1,4 +1,4 @@
-package com.example.coincapapp.ui.navigation
+package com.example.coincapapp.navigation
 
 import com.example.coincapapp.R
 

@@ -1,4 +1,4 @@
-package com.example.coincapapp.ui.navigation
+package com.example.coincapapp.navigation
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -19,7 +19,8 @@ fun BottomNavigationBar(
 ) {
 
     val screens = listOf(
-        BottomNavigationItem.Assets, BottomNavigationItem.Exchanges
+        BottomNavigationItem.Assets,
+        BottomNavigationItem.Exchanges,
     )
 
     NavigationBar(
@@ -31,7 +32,7 @@ fun BottomNavigationBar(
         screens.forEach { screen ->
             NavigationBarItem(
                 label = { Text(text = screen.title) },
-                selected = currentRoute == screen.route || (currentRoute == Routes.AssetInfo.route && screen.route == BottomNavigationItem.Assets.route),
+                selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
                         navController.graph.startDestinationRoute?.let { route ->
@@ -39,7 +40,7 @@ fun BottomNavigationBar(
                                 saveState = true
                             }
                             launchSingleTop = true
-                        //    restoreState = true
+                            restoreState = true
                         }
                     }
                 },

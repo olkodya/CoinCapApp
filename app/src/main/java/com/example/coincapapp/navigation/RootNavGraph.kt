@@ -1,11 +1,10 @@
-package com.example.coincapapp.ui.navigation
+package com.example.coincapapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.coincapapp.ui.screens.DetailScreen
-import com.example.coincapapp.ui.screens.MainScreen
+import com.example.coincapapp.feature.coinDetail.presentation.DetailScreen
 
 @Composable
 fun RootNavGraph(navHostController: NavHostController) {

@@ -1,11 +1,11 @@
-package com.example.coincapapp.ui.navigation
+package com.example.coincapapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.coincapapp.ui.screens.AssetsScreen
-import com.example.coincapapp.ui.screens.ExchangesScreen
+import com.example.coincapapp.feature.coinList.presentation.AssetsScreen
+import com.example.coincapapp.feature.exchange.presentation.ExchangesScreen
 
 @Composable
 fun MainNavGraph(navHostController: NavHostController, rootNavHostController: NavHostController) {
@@ -20,7 +20,5 @@ fun MainNavGraph(navHostController: NavHostController, rootNavHostController: Na
         composable(BottomNavigationItem.Exchanges.route) {
             ExchangesScreen()
         }
-
     }
-
 }
