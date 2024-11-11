@@ -2,9 +2,8 @@ package com.example.coincapapp.feature.coinList.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.coincapapp.feature.coinList.data.CoinRepository
+import com.example.coincapapp.feature.coinList.domain.GetCoinListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,13 +11,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class CoinListViewModel @Inject constructor(
-    val repository: CoinRepository,
+    val getCoinListUseCase: GetCoinListUseCase,
 ) : ViewModel() {
 
-    private val mutableState: MutableStateFlow<CoinListState> = MutableStateFlow(CoinListState.Loading)
+    private val mutableState: MutableStateFlow<CoinListState> =
+        MutableStateFlow(CoinListState.Loading)
     val state: StateFlow<CoinListState> = mutableState.asStateFlow()
 
     private val mutableActions: Channel<CoinListEvent> = Channel()
@@ -33,6 +34,7 @@ class CoinListViewModel @Inject constructor(
             is CoinListAction.OnSearchFieldSelected -> {
 
             }
+
             is CoinListAction.OnCoinClicked -> {
 
             }
@@ -41,15 +43,19 @@ class CoinListViewModel @Inject constructor(
 
     fun loadAssets() {
         viewModelScope.launch {
-            val response = repository.loadPagingCoins("1", 1, 1)
+            val response = getCoinListUseCase("1", 1, 1)
             println("12354132512 - " + response)
-            mutableState.value = CoinListState.Error("", {})
+            mutableState.value = CoinListState.Content(response.map {
+                it.toState()
+            })
+
         }
     }
 
     fun searchAsset() {
 
     }
+
 
     sealed class CoinListAction {
         data class OnSearchFieldSelected(val string: String) : CoinListAction()

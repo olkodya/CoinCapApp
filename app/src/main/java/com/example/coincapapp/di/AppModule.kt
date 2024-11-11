@@ -12,6 +12,7 @@ import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -23,14 +24,11 @@ object AppModules {
         install(ContentNegotiation) {
             json(
                 Json {
+                    ignoreUnknownKeys = true
                     prettyPrint = true
                     isLenient = true
                 }
             )
         }
     }
-
-    @Provides
-    @Singleton
-    fun providesCoinRepository(client: HttpClient) = CoinRepositoryImpl(client = client)
 }

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.coincapapp.feature.coinList.presentation.AssetsScreen
+import com.example.coincapapp.feature.coinList.presentation.CoinListScreen
 import com.example.coincapapp.feature.exchange.presentation.ExchangesScreen
 
 @Composable
@@ -14,7 +14,7 @@ fun MainNavGraph(navHostController: NavHostController, rootNavHostController: Na
         startDestination = BottomNavigationItem.Assets.route
     ) {
         composable(BottomNavigationItem.Assets.route) {
-            AssetsScreen(navController = rootNavHostController)
+            CoinListScreen({ rootNavHostController.navigate(Routes.AssetInfo.route) })
         }
 
         composable(BottomNavigationItem.Exchanges.route) {

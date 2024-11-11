@@ -9,51 +9,62 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.example.coincapapp.navigation.Routes
 import com.example.coincapapp.ui.theme.CoinCapAppTheme
 
 @Composable
-fun AssetsScreen(navController: NavHostController) {
-    val items = listOf(1, 3, 4, 5, 7, 8, 8, 9, 10)
-    val vm: CoinListViewModel = hiltViewModel()
-    LazyColumn() {
-        item {
-            Text(vm.state.toString())
-        }
-        items(items) { message ->
-            AssetCard(navController, message.toString())
+fun CoinListScreen(onCoinClick: () -> Unit) {
+    val viewModel: CoinListViewModel = hiltViewModel()
+    val state = viewModel.state.collectAsState()
+
+    when (state.value) {
+        is CoinListState.Content -> {
+            LazyColumn() {
+                item {
+                    Text(viewModel.state.toString())
+                }
+                items((state.value as CoinListState.Content).coins) { coin ->
+                    AssetCard(onCoinClick, coin)
+                }
+
+            }
         }
 
+        is CoinListState.Error -> {
+            Text("Error")
+        }
 
+        CoinListState.Loading -> {
+            Text("Loading")
+        }
     }
+
 
 }
 
 @Composable
-private fun AssetCard(navController: NavHostController, toString: String) {
+private fun AssetCard(onCoinClick: () -> Unit, coin: CoinState) {
     Card(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .padding(vertical = 16.dp)
             .clickable {
-                navController.navigate(Routes.AssetInfo.route)
+                onCoinClick()
             }
     ) {
         Row {
             AsyncImage(model = "", contentDescription = "")
-
             Column {
-                Text(text = "Name" + toString)
-                Text(text = "Rank")
+                Text(text = "Name" + coin.name)
+                Text(text = "Rank" + coin.rank)
                 Text(text = "Price")
                 Text(text = "percent24hr")
             }
