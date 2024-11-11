@@ -27,9 +27,6 @@ fun CoinListScreen(onCoinClick: () -> Unit) {
     when (state.value) {
         is CoinListState.Content -> {
             LazyColumn() {
-                item {
-                    Text(viewModel.state.toString())
-                }
                 items((state.value as CoinListState.Content).coins) { coin ->
                     AssetCard(onCoinClick, coin)
                 }
@@ -55,7 +52,7 @@ private fun AssetCard(onCoinClick: () -> Unit, coin: CoinState) {
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .padding(vertical = 16.dp)
+            .padding(vertical = 8.dp, horizontal = 8.dp)
             .clickable {
                 onCoinClick()
             }
@@ -63,10 +60,11 @@ private fun AssetCard(onCoinClick: () -> Unit, coin: CoinState) {
         Row {
             AsyncImage(model = "", contentDescription = "")
             Column {
-                Text(text = "Name" + coin.name)
-                Text(text = "Rank" + coin.rank)
-                Text(text = "Price")
-                Text(text = "percent24hr")
+                Text(text = "Name " + coin.name)
+                Text(text = "Rank " + coin.rank)
+                Text(text = "Price " + coin.priceUsd)
+                Text(text = "Symbol " + coin.symbol)
+                Text(text = "percent24hr " + coin.changePercent24Hr)
             }
         }
 

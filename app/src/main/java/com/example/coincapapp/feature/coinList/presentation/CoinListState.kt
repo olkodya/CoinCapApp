@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 
 
-
 @Immutable
 sealed class CoinListState {
 
