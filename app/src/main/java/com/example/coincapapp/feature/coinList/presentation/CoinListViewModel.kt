@@ -2,7 +2,10 @@ package com.example.coincapapp.feature.coinList.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.example.coincapapp.feature.coinList.domain.GetCoinListUseCase
+import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +23,7 @@ class CoinListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val mutableState: MutableStateFlow<CoinListState> =
-        MutableStateFlow(CoinListState.Loading)
+        MutableStateFlow(CoinListState.InitialLoading)
     val state: StateFlow<CoinListState> = mutableState.asStateFlow()
 
     private val mutableActions: Channel<CoinListEvent> = Channel()
@@ -43,11 +47,23 @@ class CoinListViewModel @Inject constructor(
 
     fun loadAssets() {
         viewModelScope.launch {
-            val response = getCoinListUseCase("1", 1, 1)
-            println("12354132512 - " + response)
-            mutableState.value = CoinListState.Content(response.map {
-                it.toState()
-            })
+//            val pagedFlow: Flow<PagingData<CoinEntity>> = getCoinListUseCase()
+//            getCoinListUseCase()
+//            println("12354132512 - " + pagedFlow.toList())
+
+
+            getCoinListUseCase().collect {
+                it.map {
+
+
+                    println("12354132512 - " + it.toState())
+                }
+            }
+
+//            mutableState.value = CoinListState.Content(response.map {
+//                it.toState()
+//            })
+
 
         }
     }

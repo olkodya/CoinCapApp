@@ -38,8 +38,17 @@ fun CoinListScreen(onCoinClick: () -> Unit) {
             Text("Error")
         }
 
-        CoinListState.Loading -> {
-            Text("Loading")
+//        CoinListState.Loading -> {
+//            Text("Loading")
+//        }
+        CoinListState.InitialLoading -> {
+        }
+
+        is CoinListState.NextPageError -> {
+
+        }
+
+        CoinListState.NextPageLoading -> {
         }
     }
 

@@ -4,5 +4,5 @@ import com.example.coincapapp.feature.coinList.data.model.CoinListResponse
 
 interface CoinRepository {
 
-    suspend fun loadPagingCoins(searchQuery: String, offset: Int, limit: Int): CoinListResponse
+    suspend fun loadPagingCoins(/*searchQuery: String, */offset: Int, limit: Int): CoinListResponse
 }

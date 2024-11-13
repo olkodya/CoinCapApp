@@ -12,10 +12,18 @@ sealed class CoinListState {
         val coins: List<CoinState>,
     ) : CoinListState()
 
-    data object Loading : CoinListState()
+    data object InitialLoading : CoinListState()
+
+    data object NextPageLoading : CoinListState()
+
 
     @Immutable
     data class Error(
+        val message: String,
+        val onRefresh: () -> Unit,
+    ) : CoinListState()
+
+    data class NextPageError(
         val message: String,
         val onRefresh: () -> Unit,
     ) : CoinListState()

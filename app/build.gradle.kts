@@ -76,4 +76,10 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:3.0.1")
 
     implementation("io.ktor:ktor-client-serialization-jvm:3.0.1")
+
+    val paging_version = "3.3.2"
+
+    implementation("androidx.paging:paging-runtime:$paging_version")
+    implementation("androidx.paging:paging-compose:3.3.2")
+
 }

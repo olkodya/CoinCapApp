@@ -11,7 +11,7 @@ class CoinRepositoryImpl @Inject constructor(
 ) : CoinRepository {
 
     override suspend fun loadPagingCoins(
-        searchQuery: String,
+//        searchQuery: String,
         offset: Int,
         limit: Int,
     ): CoinListResponse = client
