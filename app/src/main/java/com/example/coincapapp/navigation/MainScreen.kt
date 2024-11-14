@@ -50,7 +50,6 @@ fun MainScreen(rootNavHostController: NavHostController) {
                 navController = mainNavHostController,
                 modifier = Modifier
             )
-
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
@@ -70,6 +69,7 @@ fun MainTopAppBar(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
+//    val viewModel: CoinListViewModel = hiltViewModel()
     if (currentRoute == BottomNavigationItem.Assets.route) {
         var searchQuery by remember { mutableStateOf("") }
         TopAppBar(
@@ -77,7 +77,10 @@ fun MainTopAppBar(
                 Column {
                     TextField(
                         value = searchQuery,
-                        onValueChange = { searchQuery = it },
+                        onValueChange = {
+                            searchQuery = it
+//                            viewModel.handleAction(CoinListAction.OnSearchFieldEdited(it))
+                        },
                         placeholder = { Text("Поиск") },
                         modifier = Modifier
                             .fillMaxWidth()

@@ -3,7 +3,7 @@ package com.example.coincapapp.feature.coinList.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.map
+import androidx.paging.cachedIn
 import com.example.coincapapp.feature.coinList.domain.GetCoinListUseCase
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,20 +22,34 @@ class CoinListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val mutableState: MutableStateFlow<CoinListState> =
-        MutableStateFlow(CoinListState.InitialLoading)
+        MutableStateFlow(CoinListState.Loading)
     val state: StateFlow<CoinListState> = mutableState.asStateFlow()
 
+    private val _pagingData: MutableStateFlow<PagingData<CoinEntity>> =
+        MutableStateFlow(PagingData.empty())
+    val pagingData: StateFlow<PagingData<CoinEntity>> = _pagingData.asStateFlow()
     private val mutableActions: Channel<CoinListEvent> = Channel()
+
+    private val _searchQuery: MutableStateFlow<String> = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+
     val action: Flow<CoinListEvent> = mutableActions.receiveAsFlow()
 
     init {
-        loadAssets()
+        viewModelScope.launch {
+//            val query = "bitcoinpos"
+//            repeat(10) {
+            loadAssets("")
+//                delay(1_000)
+        }
+//        }
     }
 
     fun handleAction(action: CoinListAction) {
         when (action) {
-            is CoinListAction.OnSearchFieldSelected -> {
-
+            is CoinListAction.OnSearchFieldEdited -> {
+                loadAssets(action.query)
             }
 
             is CoinListAction.OnCoinClicked -> {
@@ -45,26 +58,14 @@ class CoinListViewModel @Inject constructor(
         }
     }
 
-    fun loadAssets() {
+    private fun loadAssets(searchQuery: String) {
         viewModelScope.launch {
-//            val pagedFlow: Flow<PagingData<CoinEntity>> = getCoinListUseCase()
-//            getCoinListUseCase()
-//            println("12354132512 - " + pagedFlow.toList())
 
-
-            getCoinListUseCase().collect {
-                it.map {
-
-
-                    println("12354132512 - " + it.toState())
+            getCoinListUseCase(searchQuery)
+                .cachedIn(viewModelScope)
+                .collect {
+                    _pagingData.value = it
                 }
-            }
-
-//            mutableState.value = CoinListState.Content(response.map {
-//                it.toState()
-//            })
-
-
         }
     }
 
@@ -74,7 +75,7 @@ class CoinListViewModel @Inject constructor(
 
 
     sealed class CoinListAction {
-        data class OnSearchFieldSelected(val string: String) : CoinListAction()
+        data class OnSearchFieldEdited(val query: String) : CoinListAction()
         data class OnCoinClicked(val coinId: String) : CoinListAction()
     }
 

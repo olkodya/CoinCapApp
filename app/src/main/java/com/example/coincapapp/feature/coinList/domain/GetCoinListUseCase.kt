@@ -5,5 +5,6 @@ import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 import kotlinx.coroutines.flow.Flow
 
 interface GetCoinListUseCase {
-    suspend operator fun invoke(): Flow<PagingData<CoinEntity>>
+
+    suspend operator fun invoke(searchQuery: String): Flow<PagingData<CoinEntity>>
 }

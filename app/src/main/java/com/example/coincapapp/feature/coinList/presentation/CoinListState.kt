@@ -8,14 +8,11 @@ import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 sealed class CoinListState {
 
     @Immutable
-    data class Content(
-        val coins: List<CoinState>,
-    ) : CoinListState()
+    data object Content : CoinListState()
 
-    data object InitialLoading : CoinListState()
+    data object Loading : CoinListState()
 
     data object NextPageLoading : CoinListState()
-
 
     @Immutable
     data class Error(
