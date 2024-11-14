@@ -13,31 +13,42 @@ data class CoinListResponse(
 data class CoinResponse(
     @SerialName("id")
     val id: String?,
+    @SerialName("rank")
     val rank: String?,
+    @SerialName("symbol")
     val symbol: String?,
+    @SerialName("name")
     val name: String?,
+    @SerialName("supply")
     val supply: String?,
+    @SerialName("maxSupply")
     val maxSupply: String?,
+    @SerialName("marketCapUsd")
     val marketCapUsd: String?,
+    @SerialName("volumeUsd24Hr")
     val volumeUsd24Hr: String?,
+    @SerialName("priceUsd")
     val priceUsd: String?,
+    @SerialName("changePercent24Hr")
     val changePercent24Hr: String?,
+    @SerialName("vwap24Hr")
     val vwap24Hr: String?,
-    val explorer: String?,
+    @SerialName("explorer")
+    val explorer: String? = "",
 )
 
 fun CoinResponse.toEntity() = CoinEntity(
-    id = id,
-    rank = rank,
-    symbol = symbol,
-    name = name,
-    supply = supply,
-    maxSupply = supply,
-    marketCapUsd = marketCapUsd,
-    volumeUsd24Hr = volumeUsd24Hr,
-    priceUsd = priceUsd,
-    changePercent24Hr = changePercent24Hr,
-    vwap24Hr = vwap24Hr,
-    explorer = explorer,
+    id = requireNotNull(id ?: ""),
+    rank = requireNotNull(rank ?: ""),
+    symbol = requireNotNull(symbol ?: ""),
+    name = requireNotNull(name ?: ""),
+    supply = requireNotNull(supply ?: ""),
+    maxSupply = requireNotNull(maxSupply ?: ""),
+    marketCapUsd = requireNotNull(marketCapUsd ?: ""),
+    volumeUsd24Hr = requireNotNull(volumeUsd24Hr ?: ""),
+    priceUsd = requireNotNull(priceUsd ?: ""),
+    changePercent24Hr = requireNotNull(changePercent24Hr ?: ""),
+    vwap24Hr = requireNotNull(vwap24Hr ?: ""),
+    explorer = requireNotNull(explorer ?: ""),
 )
 

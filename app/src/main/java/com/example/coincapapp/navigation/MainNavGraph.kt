@@ -8,13 +8,20 @@ import com.example.coincapapp.feature.coinList.presentation.CoinListScreen
 import com.example.coincapapp.feature.exchange.presentation.ExchangesScreen
 
 @Composable
-fun MainNavGraph(navHostController: NavHostController, rootNavHostController: NavHostController) {
+fun MainNavGraph(
+    navHostController: NavHostController,
+    rootNavHostController: NavHostController
+) {
     NavHost(
         navController = navHostController,
         startDestination = BottomNavigationItem.Assets.route
     ) {
         composable(BottomNavigationItem.Assets.route) {
-            CoinListScreen({ rootNavHostController.navigate(Routes.AssetInfo.route) })
+            CoinListScreen(
+                routeToCoinDetailScreen = {
+                    rootNavHostController.navigate(Routes.AssetInfo.route)
+                },
+            )
         }
 
         composable(BottomNavigationItem.Exchanges.route) {

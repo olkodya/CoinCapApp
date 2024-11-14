@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.coincapapp.feature.coinList.domain.GetCoinListUseCase
-import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -21,58 +20,45 @@ class CoinListViewModel @Inject constructor(
     val getCoinListUseCase: GetCoinListUseCase,
 ) : ViewModel() {
 
-    private val mutableState: MutableStateFlow<CoinListState> =
-        MutableStateFlow(CoinListState.Loading)
-    val state: StateFlow<CoinListState> = mutableState.asStateFlow()
+    private val mutableFieldState: MutableStateFlow<String> = MutableStateFlow("")
+    val fieldState: StateFlow<String> = mutableFieldState.asStateFlow()
 
-    private val _pagingData: MutableStateFlow<PagingData<CoinEntity>> =
+    private val mutableCoinsPagingState: MutableStateFlow<PagingData<CoinState>> =
         MutableStateFlow(PagingData.empty())
-    val pagingData: StateFlow<PagingData<CoinEntity>> = _pagingData.asStateFlow()
+    val coinsPagingState: StateFlow<PagingData<CoinState>> = mutableCoinsPagingState.asStateFlow()
+
     private val mutableActions: Channel<CoinListEvent> = Channel()
-
-    private val _searchQuery: MutableStateFlow<String> = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
-
-
     val action: Flow<CoinListEvent> = mutableActions.receiveAsFlow()
 
     init {
-        viewModelScope.launch {
-//            val query = "bitcoinpos"
-//            repeat(10) {
-            loadAssets("")
-//                delay(1_000)
-        }
-//        }
+        loadAssets(fieldState.value)
     }
 
     fun handleAction(action: CoinListAction) {
         when (action) {
-            is CoinListAction.OnSearchFieldEdited -> {
-                loadAssets(action.query)
-            }
-
+            is CoinListAction.OnSearchFieldEdited -> fieldChanged(action.query)
             is CoinListAction.OnCoinClicked -> {
-
+                viewModelScope.launch {
+                    mutableActions.send(CoinListEvent.NavigateToCoinDetail(action.coinId))
+                }
             }
         }
     }
 
     private fun loadAssets(searchQuery: String) {
         viewModelScope.launch {
-
             getCoinListUseCase(searchQuery)
                 .cachedIn(viewModelScope)
                 .collect {
-                    _pagingData.value = it
+                    mutableCoinsPagingState.value = it
                 }
         }
     }
 
-    fun searchAsset() {
-
+    private fun fieldChanged(query: String) {
+        mutableFieldState.value = query
+        loadAssets(query)
     }
-
 
     sealed class CoinListAction {
         data class OnSearchFieldEdited(val query: String) : CoinListAction()

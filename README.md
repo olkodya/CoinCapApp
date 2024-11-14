@@ -6,8 +6,7 @@
 2. Jetpack Compose - UI
 3. Jetpack navigation - навигация в приложении
 4. Compose Сharts - отрисовка графика изменения цены крипотовалюты
-5. Coil - для загрузки изображений
-6. Dagger 2 - DI
+5. Dagger 2 - DI
 
 
 ## Подзадачи  

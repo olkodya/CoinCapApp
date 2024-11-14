@@ -1,30 +1,8 @@
 package com.example.coincapapp.feature.coinList.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
-
-
-@Immutable
-sealed class CoinListState {
-
-    @Immutable
-    data object Content : CoinListState()
-
-    data object Loading : CoinListState()
-
-    data object NextPageLoading : CoinListState()
-
-    @Immutable
-    data class Error(
-        val message: String,
-        val onRefresh: () -> Unit,
-    ) : CoinListState()
-
-    data class NextPageError(
-        val message: String,
-        val onRefresh: () -> Unit,
-    ) : CoinListState()
-}
 
 @Immutable
 data class CoinState(
@@ -42,22 +20,8 @@ data class CoinState(
     val explorer: String
 )
 
+@SuppressLint("DefaultLocale")
 fun CoinEntity.toState() = CoinState(
-    id = id ?: "",
-    rank = rank ?: "",
-    symbol = symbol ?: "",
-    name = name ?: "",
-    supply = supply ?: "",
-    maxSupply = maxSupply ?: "",
-    marketCapUsd = marketCapUsd ?: "",
-    volumeUsd24Hr = volumeUsd24Hr ?: "",
-    priceUsd = priceUsd ?: "",
-    changePercent24Hr = changePercent24Hr ?: "",
-    vwap24Hr = vwap24Hr ?: "",
-    explorer = explorer ?: "",
-)
-
-fun CoinState.toEntity() = CoinEntity(
     id = id,
     rank = rank,
     symbol = symbol,
@@ -66,8 +30,23 @@ fun CoinState.toEntity() = CoinEntity(
     maxSupply = maxSupply,
     marketCapUsd = marketCapUsd,
     volumeUsd24Hr = volumeUsd24Hr,
-    priceUsd = priceUsd,
-    changePercent24Hr = changePercent24Hr,
+    priceUsd = String.format("%.3f", priceUsd.toBigDecimal()),
+    changePercent24Hr = String.format("%.3f", priceUsd.toBigDecimal()),
     vwap24Hr = vwap24Hr,
-    explorer = explorer
+    explorer = explorer,
 )
+
+//fun CoinState.toEntity() = CoinEntity(
+//    id = id,
+//    rank = rank,
+//    symbol = symbol,
+//    name = name,
+//    supply = supply,
+//    maxSupply = maxSupply,
+//    marketCapUsd = marketCapUsd,
+//    volumeUsd24Hr = volumeUsd24Hr,
+//    priceUsd = priceUsd,
+//    changePercent24Hr = changePercent24Hr,
+//    vwap24Hr = vwap24Hr,
+//    explorer = explorer
+//)
