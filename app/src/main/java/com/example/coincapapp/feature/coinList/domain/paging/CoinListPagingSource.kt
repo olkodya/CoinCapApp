@@ -23,7 +23,6 @@ class CoinListPagingSource(
             val entities = response.map {
                 it.toEntity()
             }
-            delay(2000)
             println("responseq3412 $nextPage ${(nextPage - 1) * params.loadSize}: $response")
             LoadResult.Page(
                 data = entities,

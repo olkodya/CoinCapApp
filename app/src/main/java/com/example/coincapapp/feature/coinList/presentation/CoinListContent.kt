@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -54,7 +55,10 @@ fun CoinListContent(
         )
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            if (coinsPagingState.itemCount == 0 && coinsPagingState.loadState.refresh !is LoadState.Loading) {
+            if (coinsPagingState.itemCount == 0 &&
+                coinsPagingState.loadState.refresh !is LoadState.Error &&
+                coinsPagingState.loadState.refresh !is LoadState.Loading
+            ) {
                 item {
                     EmptyState(
                         modifier = Modifier.fillParentMaxSize(),
@@ -155,15 +159,15 @@ private fun ErrorPagingItem(
     onClickRetry: () -> Unit
 ) {
     Column(
-        modifier = modifier
-            .wrapContentHeight(),
+        modifier = Modifier
+            .fillMaxWidth(),
+//            .wrapContentWidth(Alignment.CenterHorizontally),,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = message,
             maxLines = 1,
-            modifier = Modifier.weight(1f),
             color = Color.Red,
         )
         OutlinedButton(onClick = onClickRetry) {

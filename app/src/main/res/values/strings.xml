@@ -8,7 +8,7 @@
     <string name="hashtag" translatable="false">%1$s#</string>
     <string name="percent" translatable="false">%</string>
     <string name="usd" translatable="false">$</string>
-    <string name="symbol">Symbol %1$s</string>
-    <string name="price">Price: %1$s %1$s</string>
-    <string name="percent24hr">Percent 24 hour: %1$s %1$s</string>
+    <string name="symbol">Symbol: %1$s</string>
+    <string name="price">Price: %1$s %2$s</string>
+    <string name="percent24hr">Percent 24 hour: %1$s %2$s</string>
 </resources>
