@@ -10,14 +10,8 @@ data class CoinState(
     val rank: String,
     val symbol: String,
     val name: String,
-    val supply: String,
-    val maxSupply: String,
-    val marketCapUsd: String,
-    val volumeUsd24Hr: String,
     val priceUsd: String,
     val changePercent24Hr: String,
-    val vwap24Hr: String,
-    val explorer: String
 )
 
 @SuppressLint("DefaultLocale")
@@ -26,27 +20,14 @@ fun CoinEntity.toState() = CoinState(
     rank = rank,
     symbol = symbol,
     name = name,
-    supply = supply,
-    maxSupply = maxSupply,
-    marketCapUsd = marketCapUsd,
-    volumeUsd24Hr = volumeUsd24Hr,
-    priceUsd = String.format("%.3f", priceUsd.toBigDecimal()),
-    changePercent24Hr = String.format("%.3f", priceUsd.toBigDecimal()),
-    vwap24Hr = vwap24Hr,
-    explorer = explorer,
+    priceUsd = if (priceUsd != "") {
+        String.format("%.5f", priceUsd.toBigDecimal())
+    } else {
+        ""
+    },
+    changePercent24Hr = if (changePercent24Hr != "") {
+        String.format("%.5f", changePercent24Hr.toBigDecimal())
+    } else {
+        ""
+    }
 )
-
-//fun CoinState.toEntity() = CoinEntity(
-//    id = id,
-//    rank = rank,
-//    symbol = symbol,
-//    name = name,
-//    supply = supply,
-//    maxSupply = maxSupply,
-//    marketCapUsd = marketCapUsd,
-//    volumeUsd24Hr = volumeUsd24Hr,
-//    priceUsd = priceUsd,
-//    changePercent24Hr = changePercent24Hr,
-//    vwap24Hr = vwap24Hr,
-//    explorer = explorer
-//)

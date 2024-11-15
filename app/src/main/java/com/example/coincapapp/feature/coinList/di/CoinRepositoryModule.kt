@@ -10,6 +10,7 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 @Module
 interface CoinRepositoryModule {
+
     @Binds
     fun bindCoinRepository(impl: CoinRepositoryImpl): CoinRepository
 }

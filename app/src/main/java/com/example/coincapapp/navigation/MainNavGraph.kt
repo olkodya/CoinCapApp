@@ -16,6 +16,7 @@ fun MainNavGraph(
         navController = navHostController,
         startDestination = BottomNavigationItem.Assets.route
     ) {
+
         composable(BottomNavigationItem.Assets.route) {
             CoinListScreen(
                 routeToCoinDetailScreen = {

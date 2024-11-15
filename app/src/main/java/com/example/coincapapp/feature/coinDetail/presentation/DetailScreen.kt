@@ -40,7 +40,6 @@ fun DetailScreen(navController: NavHostController) {
 
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExchangesTopAppBar(navController: NavHostController) {
@@ -55,5 +54,4 @@ fun ExchangesTopAppBar(navController: NavHostController) {
             }
         }
     )
-
 }

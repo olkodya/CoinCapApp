@@ -14,5 +14,3 @@ data class CoinEntity(
     val vwap24Hr: String,
     val explorer: String,
 )
-
-

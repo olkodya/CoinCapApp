@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -31,18 +30,13 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun MainScreen(rootNavHostController: NavHostController) {
-
     val mainNavHostController: NavHostController = rememberNavController()
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-//        topBar = {
-//            MainTopAppBar(mainNavHostController, scope, snackbarHostState, viewModel)
-//        },
         bottomBar = {
             BottomNavigationBar(
                 navController = mainNavHostController,
@@ -53,49 +47,5 @@ fun MainScreen(rootNavHostController: NavHostController) {
         Box(modifier = Modifier.padding(paddingValues)) {
             MainNavGraph(mainNavHostController, rootNavHostController)
         }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainTopAppBar(
-    navController: NavController,
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    viewModel: CoinListViewModel
-) {
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
-    if (currentRoute == BottomNavigationItem.Assets.route) {
-        var searchQuery by remember { mutableStateOf("") }
-        TopAppBar(
-            title = {
-                Column {
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = {
-                            searchQuery = it
-                            viewModel.handleAction(
-                                CoinListViewModel.CoinListAction.OnSearchFieldEdited(
-                                    it
-                                )
-                            )
-                        },
-                        placeholder = { Text(stringResource(R.string.search_string)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        singleLine = true,
-                    )
-                }
-            },
-        )
-    } else if (currentRoute == BottomNavigationItem.Exchanges.route) {
-        TopAppBar(
-            title = {
-                Text(text = stringResource(R.string.exchanges_tool_bar_title))
-            },
-        )
     }
 }

@@ -16,7 +16,7 @@ class CoinRepositoryImpl @Inject constructor(
         offset: Int,
         limit: Int,
     ): CoinListResponse = client
-        .get("https://api.coincap.io/v2/assets") {
+        .get("assets") {
             parameter("search", searchQuery)
             parameter("offset", offset)
             parameter("limit", limit)

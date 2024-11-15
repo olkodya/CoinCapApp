@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.example.coincapapp.feature.coinList.data.CoinRepository
 import com.example.coincapapp.feature.coinList.data.model.toEntity
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
+import kotlinx.coroutines.delay
 
 class CoinListPagingSource(
     private val repository: CoinRepository,
@@ -19,11 +20,10 @@ class CoinListPagingSource(
                 limit = params.loadSize,
                 offset = (nextPage - 1) * params.loadSize,
             ).data // TODO: Implement data fetching
-
             val entities = response.map {
                 it.toEntity()
             }
-
+            delay(2000)
             println("responseq3412 $nextPage ${(nextPage - 1) * params.loadSize}: $response")
             LoadResult.Page(
                 data = entities,

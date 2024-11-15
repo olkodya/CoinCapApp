@@ -11,8 +11,8 @@ import io.ktor.client.engine.cio.CIO
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.serialization.kotlinx.json.json
-import dagger.hilt.android.components.ViewModelComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -29,6 +29,9 @@ object AppModules {
                     isLenient = true
                 }
             )
+        }
+        defaultRequest {
+            url("https://api.coincap.io/v2/")
         }
     }
 }

@@ -16,7 +16,6 @@ class GetCoinListUseCaseImpl @Inject constructor(
 ) : GetCoinListUseCase {
 
     override suspend operator fun invoke(searchQuery: String): Flow<PagingData<CoinState>> {
-
         val config = PagingConfig(
             initialLoadSize = 100,
             pageSize = 100,

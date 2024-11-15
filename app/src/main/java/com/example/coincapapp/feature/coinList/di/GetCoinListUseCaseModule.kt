@@ -11,6 +11,7 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 @Module
 interface GetCoinListUseCaseModule {
+
     @Binds
     fun bindGetCoinListUseCase(impl: GetCoinListUseCaseImpl): GetCoinListUseCase
 }

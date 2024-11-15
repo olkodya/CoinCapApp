@@ -17,7 +17,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 fun BottomNavigationBar(
     navController: NavHostController, modifier: Modifier
 ) {
-
     val screens = listOf(
         BottomNavigationItem.Assets,
         BottomNavigationItem.Exchanges,
@@ -29,6 +28,7 @@ fun BottomNavigationBar(
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
+
         screens.forEach { screen ->
             NavigationBarItem(
                 label = { Text(text = screen.title) },
@@ -50,12 +50,6 @@ fun BottomNavigationBar(
                         contentDescription = screen.title
                     )
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    unselectedTextColor = Color.Black,
-                    selectedTextColor = Color.Blue,
-                    unselectedIconColor = Color.Black,
-                    selectedIconColor = Color.Blue
-                )
             )
         }
     }
