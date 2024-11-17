@@ -26,9 +26,7 @@ fun DetailScreen(navController: NavHostController) {
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            Text("pupupu")
-            Text("pupupu")
-            Text("pupupu")
+
             Button(onClick = {
                 navController.popBackStack()
 

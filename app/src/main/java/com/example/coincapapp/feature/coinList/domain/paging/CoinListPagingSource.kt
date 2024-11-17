@@ -5,7 +5,6 @@ import androidx.paging.PagingState
 import com.example.coincapapp.feature.coinList.data.CoinRepository
 import com.example.coincapapp.feature.coinList.data.model.toEntity
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
-import kotlinx.coroutines.delay
 
 class CoinListPagingSource(
     private val repository: CoinRepository,

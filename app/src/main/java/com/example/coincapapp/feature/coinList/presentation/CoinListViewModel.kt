@@ -6,15 +6,21 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.coincapapp.feature.coinList.domain.GetCoinListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class CoinListViewModel @Inject constructor(
     val getCoinListUseCase: GetCoinListUseCase,
@@ -30,8 +36,18 @@ class CoinListViewModel @Inject constructor(
     private val mutableActions: Channel<CoinListEvent> = Channel()
     val action: Flow<CoinListEvent> = mutableActions.receiveAsFlow()
 
+    private var searchJob: Job? = null
+
     init {
         loadAssets(fieldState.value)
+        viewModelScope.launch {
+            fieldState
+                .drop(1)
+                .debounce(1_500)
+                .collectLatest {
+                    loadAssets(fieldState.value)
+                }
+        }
     }
 
     fun handleAction(action: CoinListAction) {
@@ -46,7 +62,8 @@ class CoinListViewModel @Inject constructor(
     }
 
     private fun loadAssets(searchQuery: String) {
-        viewModelScope.launch {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             getCoinListUseCase(searchQuery)
                 .cachedIn(viewModelScope)
                 .collect {
@@ -57,7 +74,6 @@ class CoinListViewModel @Inject constructor(
 
     private fun fieldChanged(query: String) {
         mutableFieldState.value = query
-        loadAssets(query)
     }
 
     sealed class CoinListAction {

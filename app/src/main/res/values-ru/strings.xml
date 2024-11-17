@@ -7,6 +7,6 @@
     <string name="exchanges_tool_bar_title">Обменники</string>
     <string name="empty_coins">Монеты не найдены</string>
     <string name="symbol">Код %1$s</string>
-    <string name="price">Цена: %1$s %1$s</string>
-    <string name="percent24hr">Процент за 24 часа: %1$s %1$s</string>
+    <string name="price">Цена: %1$s %2$s</string>
+    <string name="percent24hr">Процент за 24 часа: %1$s %2$s</string>
 </resources>

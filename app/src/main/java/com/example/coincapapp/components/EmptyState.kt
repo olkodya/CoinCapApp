@@ -6,12 +6,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun EmptyState(
-    message: String,
     modifier: Modifier = Modifier,
+    message: String,
 ) {
     Box(
         modifier = modifier,
@@ -22,4 +23,13 @@ fun EmptyState(
             text = message,
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EmptyStatePreview() {
+    EmptyState(
+        modifier = Modifier,
+        message = "Coins not found"
+    )
 }

@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
@@ -24,14 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.coincapapp.R
 import com.example.coincapapp.components.EmptyState
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun CoinListContent(
@@ -74,7 +77,7 @@ fun CoinListContent(
                 ) { index ->
                     val coinState = coinsPagingState[index]
                     coinState?.let { coin ->
-                        AssetCard(
+                        CoinCard(
                             coin = coin,
                             onCoinClick = {
                                 handleAction(CoinListViewModel.CoinListAction.OnCoinClicked(coin.id))
@@ -119,26 +122,6 @@ fun CoinListContent(
     }
 }
 
-@Composable
-private fun LazyListScope.CoinsList(
-    coinsPagingState: LazyPagingItems<CoinState>,
-    onCoinClick: (String) -> Unit,
-) {
-    items(
-        count = coinsPagingState.itemCount,
-        key = { index ->
-            coinsPagingState[index]?.id ?: index
-        }
-    ) { index ->
-        val coinState = coinsPagingState[index]
-        coinState?.let {
-            AssetCard(
-                coin = it,
-                onCoinClick = { onCoinClick(coinState.id) },
-            )
-        }
-    }
-}
 
 @Composable
 private fun LoadingPagingItem() {
@@ -155,13 +138,11 @@ private fun LoadingPagingItem() {
 @Composable
 private fun ErrorPagingItem(
     message: String,
-    modifier: Modifier = Modifier,
     onClickRetry: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth(),
-//            .wrapContentWidth(Alignment.CenterHorizontally),,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -177,7 +158,7 @@ private fun ErrorPagingItem(
 }
 
 @Composable
-private fun AssetCard(onCoinClick: () -> Unit, coin: CoinState) {
+private fun CoinCard(onCoinClick: () -> Unit, coin: CoinState) {
     Card(
         modifier = Modifier
             .wrapContentHeight()
@@ -216,3 +197,73 @@ private fun AssetCard(onCoinClick: () -> Unit, coin: CoinState) {
         }
     }
 }
+
+
+@Composable
+@Preview
+fun CoinCardPreview() {
+    CoinCard(
+        onCoinClick = {},
+        coin = CoinState(
+            id = "bitcoin",
+            rank = "1",
+            symbol = "BTC",
+            name = "Bitcoin",
+            priceUsd = "90387.50000",
+            changePercent24Hr = "1.00000"
+        )
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ErrorPagingItemPreview() {
+    ErrorPagingItem(
+        message = "Error",
+        onClickRetry = {}
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun LoadingItemPreview() {
+    LoadingPagingItem()
+}
+
+@Composable
+fun rememberMockCoinsPagingItems(): LazyPagingItems<CoinState> {
+    val mockCoinsFlow: Flow<PagingData<CoinState>> = flowOf(
+        PagingData.from(
+            listOf(
+                CoinState(
+                    id = "Bitcoin",
+                    rank = "1",
+                    symbol = "BTC",
+                    name = "Bitcoin",
+                    priceUsd = "90387.50000",
+                    changePercent24Hr = "1.0000000"
+                ),
+                CoinState(
+                    id = "bitcoin-cash",
+                    rank = "16",
+                    symbol = "BCH",
+                    name = "Bitcoin Cash",
+                    priceUsd = "449.11382",
+                    changePercent24Hr = "3.32509"
+                )
+            )
+        )
+    )
+    return mockCoinsFlow.collectAsLazyPagingItems()
+}
+
+@Composable
+@Preview(showBackground = true)
+fun CoinListPreview() {
+    CoinListContent(
+        fieldState = "bitcoin",
+        coinsPagingState = rememberMockCoinsPagingItems(),
+    ) {
+    }
+}
+
