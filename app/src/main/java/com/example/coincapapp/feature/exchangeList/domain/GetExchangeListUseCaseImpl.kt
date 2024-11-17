@@ -8,11 +8,14 @@ import javax.inject.Inject
 class GetExchangeListUseCaseImpl @Inject constructor(private val repository: ExchangeRepository) :
     GetExchangeListUseCase {
     override suspend fun invoke(): List<ExchangeEntity> {
-        val entities = repository.loadExchanges().data.map {
-            it.toEntity()
+        try {
+            val entities = repository.loadExchanges().data.map {
+                it.toEntity()
+            }
+            println("responseq3412 : $entities")
+            return entities
+        } catch (e: Exception) {
+            throw Exception()
         }
-        println("responseq3412 : $entities")
-        return entities
-
     }
 }

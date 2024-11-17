@@ -13,7 +13,7 @@ sealed class ExchangeListState {
 
     data object Loading : ExchangeListState()
 
-    data object Error : ExchangeListState()
+    data class Error(val message: String?) : ExchangeListState()
 }
 
 data class ExchangeState(

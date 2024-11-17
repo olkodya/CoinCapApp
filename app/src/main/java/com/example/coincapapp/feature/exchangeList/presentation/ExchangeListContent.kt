@@ -1,7 +1,5 @@
 package com.example.coincapapp.feature.exchangeList.presentation
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,41 +14,39 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withLink
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
 
 @Composable
-fun ExchangeListContent(value: ExchangeListState) {
-    Column {
+fun ExchangeListContent(
+    exchangeListState: ExchangeListState,
+    handleAction: (ExchangeListViewModel.ExchangeListAction) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
         ExchangesTopAppBar()
-        when (value) {
-            is ExchangeListState.Content -> ExchangeList(value)
-            ExchangeListState.Error -> {
+        when (exchangeListState) {
+            is ExchangeListState.Content -> ExchangeList(
+                value = exchangeListState,
+                handleAction = handleAction
+            )
+
+            ExchangeListState.Loading -> {
+                LoadingState(Modifier.fillMaxSize())
+            }
+
+            is ExchangeListState.Error -> {
                 ErrorState(
-                    modifier = Modifier,
-                    message = "Error",
+                    modifier = Modifier.fillMaxSize(),
+                    message = exchangeListState.message ?: "Error",
                     onRetryClick = {}
                 )
             }
-
-            ExchangeListState.Loading -> {
-                LoadingState()
-            }
         }
     }
-
-
 }
 
 
@@ -62,12 +58,15 @@ fun ExchangesTopAppBar() {
 }
 
 @Composable
-fun ExchangeList(value: ExchangeListState) {
+fun ExchangeList(
+    value: ExchangeListState,
+    handleAction: (ExchangeListViewModel.ExchangeListAction) -> Unit
+) {
     if (value is ExchangeListState.Content) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(count = value.exchanges.size, key = { id -> value.exchanges[id].id }) { index ->
                 val exchange = value.exchanges[index]
-                ExchangeCard(exchange)
+                ExchangeCard(exchange = exchange, handleAction = handleAction)
             }
 
         }
@@ -75,16 +74,23 @@ fun ExchangeList(value: ExchangeListState) {
 }
 
 @Composable
-fun ExchangeCard(exchange: ExchangeState) {
+fun ExchangeCard(
+    exchange: ExchangeState,
+    handleAction: (ExchangeListViewModel.ExchangeListAction) -> Unit
+) {
     Card(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 8.dp)
+            .clickable {
+                handleAction(
+                    ExchangeListViewModel.ExchangeListAction.OnExchangeUrlClicked(
+                        exchange.exchangeUrl
+                    )
+                )
+            }
     ) {
-
-
-
         Column(Modifier.padding(16.dp)) {
             Row() {
                 Text(
@@ -104,9 +110,6 @@ fun ExchangeCard(exchange: ExchangeState) {
                     exchange.percentTotalVolume,
                     stringResource(R.string.percent)
                 )
-            )
-            Text(
-                text = exchange.exchangeUrl
             )
         }
     }

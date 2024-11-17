@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class ExchangeListViewModel @Inject constructor(
     private val getExchangeListUseCase: GetExchangeListUseCase
@@ -30,22 +31,45 @@ class ExchangeListViewModel @Inject constructor(
     }
 
 
-    private fun loadExchanges() {
-        viewModelScope.launch {
-            val exchanges: List<ExchangeState> = getExchangeListUseCase().map {
-                it.toState()
-            }
-            mutableExchangeListState.value = ExchangeListState.Content(exchanges = exchanges)
+    fun handleAction(action: ExchangeListAction) {
+        when (action) {
+            is ExchangeListAction.OnExchangeUrlClicked -> openUrlInBrowser(action.exchangeUrl)
         }
+
+    }
+
+    private fun openUrlInBrowser(exchangeUrl: String) {
+        viewModelScope.launch {
+            mutableActions.send(
+                ExchangeListEvent.OpenUrlInBrowser(exchangeUrl)
+            )
+        }
+
+    }
+
+
+    private fun loadExchanges() {
+
+        viewModelScope.launch {
+            try {
+                val exchanges: List<ExchangeState> = getExchangeListUseCase().map {
+                    it.toState()
+                }
+                mutableExchangeListState.value = ExchangeListState.Content(exchanges = exchanges)
+            } catch (ex: Exception) {
+                mutableExchangeListState.value = ExchangeListState.Error(message = ex.message)
+            }
+        }
+
     }
 
 
     sealed class ExchangeListAction {
-        data class onExchangeClicked(val exchangeUrl: String) : ExchangeListAction()
+        data class OnExchangeUrlClicked(val exchangeUrl: String) : ExchangeListAction()
     }
 
 
     sealed class ExchangeListEvent {
-        data class moveByUrl(val exchangeUrl: String)
+        data class OpenUrlInBrowser(val exchangeUrl: String) : ExchangeListEvent()
     }
 }
