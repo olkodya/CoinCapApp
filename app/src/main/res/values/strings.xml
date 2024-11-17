@@ -9,6 +9,6 @@
     <string name="percent" translatable="false">%</string>
     <string name="usd" translatable="false">$</string>
     <string name="symbol">Symbol: %1$s</string>
-    <string name="price">Price: %1$s %2$s</string>
-    <string name="percent24hr">Percent 24 hour: %1$s %2$s</string>
+    <string name="price">Price: %.5f %s</string>
+    <string name="percent24hr">Percent 24 hour: %.5f %s</string>
 </resources>

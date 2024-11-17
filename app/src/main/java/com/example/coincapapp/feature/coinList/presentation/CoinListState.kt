@@ -3,6 +3,7 @@ package com.example.coincapapp.feature.coinList.presentation
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
+import java.math.BigDecimal
 
 @Immutable
 data class CoinState(
@@ -10,8 +11,8 @@ data class CoinState(
     val rank: String,
     val symbol: String,
     val name: String,
-    val priceUsd: String,
-    val changePercent24Hr: String,
+    val priceUsd: BigDecimal,
+    val changePercent24Hr: BigDecimal,
 )
 
 @SuppressLint("DefaultLocale")
@@ -20,14 +21,6 @@ fun CoinEntity.toState() = CoinState(
     rank = rank,
     symbol = symbol,
     name = name,
-    priceUsd = if (priceUsd != "") {
-        String.format("%.5f", priceUsd.toBigDecimal())
-    } else {
-        ""
-    },
-    changePercent24Hr = if (changePercent24Hr != "") {
-        String.format("%.5f", changePercent24Hr.toBigDecimal())
-    } else {
-        ""
-    }
+    priceUsd = priceUsd,
+    changePercent24Hr = changePercent24Hr
 )

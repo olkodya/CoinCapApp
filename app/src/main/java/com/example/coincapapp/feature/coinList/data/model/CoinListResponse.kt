@@ -1,8 +1,10 @@
 package com.example.coincapapp.feature.coinList.data.model
 
+import com.example.coincapapp.feature.coinList.data.BigDecimalSerializer
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.math.BigDecimal
 
 @Serializable
 data class CoinListResponse(
@@ -28,9 +30,11 @@ data class CoinResponse(
     @SerialName("volumeUsd24Hr")
     val volumeUsd24Hr: String?,
     @SerialName("priceUsd")
-    val priceUsd: String?,
+    @Serializable(with = BigDecimalSerializer::class)
+    val priceUsd: BigDecimal?,
+    @Serializable(with = BigDecimalSerializer::class)
     @SerialName("changePercent24Hr")
-    val changePercent24Hr: String?,
+    val changePercent24Hr: BigDecimal?,
     @SerialName("vwap24Hr")
     val vwap24Hr: String?,
     @SerialName("explorer")
@@ -46,8 +50,8 @@ fun CoinResponse.toEntity() = CoinEntity(
     maxSupply = requireNotNull(maxSupply ?: ""),
     marketCapUsd = requireNotNull(marketCapUsd ?: ""),
     volumeUsd24Hr = requireNotNull(volumeUsd24Hr ?: ""),
-    priceUsd = requireNotNull(priceUsd ?: ""),
-    changePercent24Hr = requireNotNull(changePercent24Hr ?: ""),
+    priceUsd = requireNotNull(priceUsd ?: BigDecimal("0.0")),
+    changePercent24Hr = requireNotNull(changePercent24Hr ?: BigDecimal("0.0")),
     vwap24Hr = requireNotNull(vwap24Hr ?: ""),
     explorer = requireNotNull(explorer ?: ""),
 )

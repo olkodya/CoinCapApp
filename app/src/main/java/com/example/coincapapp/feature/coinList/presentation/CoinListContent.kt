@@ -35,6 +35,7 @@ import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import java.math.BigDecimal
 
 @Composable
 fun CoinListContent(
@@ -209,8 +210,8 @@ fun CoinCardPreview() {
             rank = "1",
             symbol = "BTC",
             name = "Bitcoin",
-            priceUsd = "90387.50000",
-            changePercent24Hr = "1.00000"
+            priceUsd = BigDecimal("90387.50000"),
+            changePercent24Hr = BigDecimal("1.00000")
         )
     )
 }
@@ -240,16 +241,16 @@ fun rememberMockCoinsPagingItems(): LazyPagingItems<CoinState> {
                     rank = "1",
                     symbol = "BTC",
                     name = "Bitcoin",
-                    priceUsd = "90387.50000",
-                    changePercent24Hr = "1.0000000"
+                    priceUsd = BigDecimal("90387.50000"),
+                    changePercent24Hr = BigDecimal("1.0000000"),
                 ),
                 CoinState(
                     id = "bitcoin-cash",
                     rank = "16",
                     symbol = "BCH",
                     name = "Bitcoin Cash",
-                    priceUsd = "449.11382",
-                    changePercent24Hr = "3.32509"
+                    priceUsd = BigDecimal("449.11382"),
+                    changePercent24Hr = BigDecimal("3.32509"),
                 )
             )
         )
