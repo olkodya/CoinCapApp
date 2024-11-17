@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.coincapapp.feature.coinList.presentation.CoinListScreen
-import com.example.coincapapp.feature.exchange.presentation.ExchangesScreen
+import com.example.coincapapp.feature.exchangeList.presentation.ExchangeListScreen
 
 @Composable
 fun MainNavGraph(
@@ -30,7 +30,7 @@ fun MainNavGraph(
         }
 
         composable<BottomNavigationItem.Exchanges> {
-            ExchangesScreen()
+            ExchangeListScreen()
         }
     }
 }

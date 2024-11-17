@@ -1,9 +1,8 @@
 package com.example.coincapapp.feature.coinList.presentation
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
-import com.example.coincapapp.feature.coinList.data.BigDecimalSerializer
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
+import com.example.coincapapp.utils.BigDecimalSerializer
 import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
@@ -20,7 +19,6 @@ data class CoinState(
     val changePercent24Hr: BigDecimal,
 )
 
-@SuppressLint("DefaultLocale")
 fun CoinEntity.toState() = CoinState(
     id = id,
     rank = rank,
