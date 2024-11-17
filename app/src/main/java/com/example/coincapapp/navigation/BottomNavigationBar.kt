@@ -3,7 +3,6 @@ package com.example.coincapapp.navigation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,7 +17,7 @@ fun BottomNavigationBar(
     navController: NavHostController, modifier: Modifier
 ) {
     val screens = listOf(
-        BottomNavigationItem.Assets,
+        BottomNavigationItem.Coins,
         BottomNavigationItem.Exchanges,
     )
 
@@ -27,14 +26,19 @@ fun BottomNavigationBar(
         containerColor = Color.Transparent,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+        val currentRoute = navBackStackEntry?.destination?.let {
+            when (it.route) {
+                BottomNavigationItem.Coins::class.qualifiedName -> BottomNavigationItem.Coins
+                else -> BottomNavigationItem.Exchanges
+            }
+        }
 
         screens.forEach { screen ->
             NavigationBarItem(
                 label = { Text(text = screen.title) },
-                selected = currentRoute == screen.route,
+                selected = currentRoute == screen,
                 onClick = {
-                    navController.navigate(screen.route) {
+                    navController.navigate(screen) {
                         navController.graph.startDestinationRoute?.let { route ->
                             popUpTo(route) {
                                 saveState = true

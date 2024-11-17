@@ -63,6 +63,8 @@ class CoinListViewModel @Inject constructor(
 
     private fun loadAssets(searchQuery: String) {
         searchJob?.cancel()
+
+
         searchJob = viewModelScope.launch {
             getCoinListUseCase(searchQuery)
                 .cachedIn(viewModelScope)

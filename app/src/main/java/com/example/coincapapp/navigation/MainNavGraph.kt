@@ -14,18 +14,22 @@ fun MainNavGraph(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = BottomNavigationItem.Assets.route
+        startDestination = BottomNavigationItem.Coins
     ) {
 
-        composable(BottomNavigationItem.Assets.route) {
+        composable<BottomNavigationItem.Coins> {
             CoinListScreen(
                 routeToCoinDetailScreen = {
-                    rootNavHostController.navigate(Routes.AssetInfo.route)
+                    rootNavHostController.navigate(
+                        Routes.ScreenDetail(
+                            coinId = "1"
+                        )
+                    )
                 },
             )
         }
 
-        composable(BottomNavigationItem.Exchanges.route) {
+        composable<BottomNavigationItem.Exchanges> {
             ExchangesScreen()
         }
     }

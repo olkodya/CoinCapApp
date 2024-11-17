@@ -1,16 +1,20 @@
 package com.example.coincapapp.navigation
 
 import com.example.coincapapp.R
+import kotlinx.serialization.Serializable
 
+@Serializable
 sealed class BottomNavigationItem(
-    var route: String,
     var icon: Int,
     var title: String,
 ) {
 
-    data object Assets :
-        BottomNavigationItem("assets_root", R.drawable.assets_icon, "Assets")
+    @Serializable
+    data object Coins :
+        BottomNavigationItem(R.drawable.assets_icon, "Assets")
 
+    @Serializable
     data object Exchanges :
-        BottomNavigationItem("exchanges_root", R.drawable.exchanges_icon, "Exchanges")
+        BottomNavigationItem(R.drawable.exchanges_icon, "Exchanges")
 }
+
