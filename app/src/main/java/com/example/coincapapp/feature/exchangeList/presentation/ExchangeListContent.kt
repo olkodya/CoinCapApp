@@ -16,10 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
+import java.math.BigDecimal
 
 @Composable
 fun ExchangeListContent(
@@ -112,5 +114,58 @@ fun ExchangeCard(
                 )
             )
         }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ExchangeCardPreview() {
+    ExchangeCard(
+        exchange = ExchangeState(
+            id = "binance",
+            name = "Binance",
+            rank = "1",
+            percentTotalVolume = BigDecimal("37.95875"),
+            volumeUsd = BigDecimal("15766846950.38742"),
+            exchangeUrl = ""
+        )
+    ) {}
+}
+
+
+@Composable
+@Preview(showBackground = true)
+fun ExchangeListPreview() {
+    ExchangeListContent(
+        exchangeListState = ExchangeListState.Content(
+            exchanges = listOf(
+                ExchangeState(
+                    id = "binance",
+                    name = "Binance",
+                    rank = "1",
+                    percentTotalVolume = BigDecimal("37.95875"),
+                    volumeUsd = BigDecimal("15766846950.38742"),
+                    exchangeUrl = ""
+                ),
+                ExchangeState(
+                    id = "crypto_com",
+                    name = "Crypto.com",
+                    rank = "2",
+                    percentTotalVolume = BigDecimal("37.95875"),
+                    volumeUsd = BigDecimal("15766846950.38742"),
+                    exchangeUrl = ""
+                ),
+                ExchangeState(
+                    id = "white_bit",
+                    name = "WhiteBit",
+                    rank = "1",
+                    percentTotalVolume = BigDecimal("37.95875"),
+                    volumeUsd = BigDecimal("15766846950.38742"),
+                    exchangeUrl = ""
+                ),
+            )
+        )
+    ) {
+
     }
 }
