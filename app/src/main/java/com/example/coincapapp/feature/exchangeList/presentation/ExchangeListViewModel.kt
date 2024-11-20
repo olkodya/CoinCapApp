@@ -18,7 +18,6 @@ class ExchangeListViewModel @Inject constructor(
     private val getExchangeListUseCase: GetExchangeListUseCase
 ) : ViewModel() {
 
-
     private val mutableExchangeListState =
         MutableStateFlow<ExchangeListState>(ExchangeListState.Loading)
     val exchangeListState = mutableExchangeListState.asStateFlow()
@@ -30,12 +29,11 @@ class ExchangeListViewModel @Inject constructor(
         loadExchanges()
     }
 
-
     fun handleAction(action: ExchangeListAction) {
         when (action) {
             is ExchangeListAction.OnExchangeUrlClicked -> openUrlInBrowser(action.exchangeUrl)
+            ExchangeListAction.OnRetryClick -> loadExchanges()
         }
-
     }
 
     private fun openUrlInBrowser(exchangeUrl: String) {
@@ -44,14 +42,12 @@ class ExchangeListViewModel @Inject constructor(
                 ExchangeListEvent.OpenUrlInBrowser(exchangeUrl)
             )
         }
-
     }
 
-
     private fun loadExchanges() {
-
         viewModelScope.launch {
             try {
+                mutableExchangeListState.value = ExchangeListState.Loading
                 val exchanges: List<ExchangeState> = getExchangeListUseCase().map {
                     it.toState()
                 }
@@ -60,14 +56,12 @@ class ExchangeListViewModel @Inject constructor(
                 mutableExchangeListState.value = ExchangeListState.Error(message = ex.message)
             }
         }
-
     }
-
 
     sealed class ExchangeListAction {
         data class OnExchangeUrlClicked(val exchangeUrl: String) : ExchangeListAction()
+        data object OnRetryClick : ExchangeListAction()
     }
-
 
     sealed class ExchangeListEvent {
         data class OpenUrlInBrowser(val exchangeUrl: String) : ExchangeListEvent()

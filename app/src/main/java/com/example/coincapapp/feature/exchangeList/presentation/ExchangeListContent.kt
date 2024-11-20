@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
+import kotlinx.collections.immutable.persistentListOf
 import java.math.BigDecimal
 
 @Composable
@@ -43,8 +44,10 @@ fun ExchangeListContent(
             is ExchangeListState.Error -> {
                 ErrorState(
                     modifier = Modifier.fillMaxSize(),
-                    message = exchangeListState.message ?: "Error",
-                    onRetryClick = {}
+                    message = exchangeListState.message ?: stringResource(R.string.error_string),
+                    onRetryClick = {
+                        handleAction(ExchangeListViewModel.ExchangeListAction.OnRetryClick)
+                    }
                 )
             }
         }
@@ -94,7 +97,7 @@ fun ExchangeCard(
             }
     ) {
         Column(Modifier.padding(16.dp)) {
-            Row() {
+            Row {
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
                     text = stringResource(R.string.hashtag).format(exchange.rank)
@@ -138,7 +141,7 @@ fun ExchangeCardPreview() {
 fun ExchangeListPreview() {
     ExchangeListContent(
         exchangeListState = ExchangeListState.Content(
-            exchanges = listOf(
+            exchanges = persistentListOf(
                 ExchangeState(
                     id = "binance",
                     name = "Binance",
@@ -162,7 +165,7 @@ fun ExchangeListPreview() {
                     percentTotalVolume = BigDecimal("37.95875"),
                     volumeUsd = BigDecimal("15766846950.38742"),
                     exchangeUrl = ""
-                ),
+                )
             )
         )
     ) {

@@ -29,5 +29,3 @@ fun ExchangeListScreen() {
         handleAction = { viewModel.handleAction(it) },
     )
 }
-
-
