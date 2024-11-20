@@ -1,6 +1,6 @@
 package com.example.coincapapp.feature.coinList.data.model
 
-import com.example.coincapapp.feature.coinList.data.BigDecimalSerializer
+import com.example.coincapapp.utils.BigDecimalSerializer
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -1,4 +1,4 @@
-package com.example.coincapapp.feature.coinList.data
+package com.example.coincapapp.utils
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
