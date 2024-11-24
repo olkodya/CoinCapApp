@@ -19,11 +19,9 @@ fun MainNavGraph(
 
         composable<BottomNavigationItem.Coins> {
             CoinListScreen(
-                routeToCoinDetailScreen = {
+                routeToCoinDetailScreen = { id ->
                     rootNavHostController.navigate(
-                        Routes.ScreenDetail(
-                            coinId = "1"
-                        )
+                        Routes.ScreenDetail(coinId = id)
                     )
                 },
             )

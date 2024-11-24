@@ -18,11 +18,10 @@ class CoinListPagingSource(
                 searchQuery = searchQuery,
                 limit = params.loadSize,
                 offset = (nextPage - 1) * params.loadSize,
-            ).data // TODO: Implement data fetching
+            ).data
             val entities = response.map {
                 it.toEntity()
             }
-            println("responseq3412 $nextPage ${(nextPage - 1) * params.loadSize}: $response")
             LoadResult.Page(
                 data = entities,
                 prevKey = if (nextPage == 1) null else nextPage - 1,

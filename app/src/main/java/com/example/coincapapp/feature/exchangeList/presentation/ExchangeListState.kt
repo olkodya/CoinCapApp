@@ -1,6 +1,7 @@
 package com.example.coincapapp.feature.exchangeList.presentation
 
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableList
 import java.math.BigDecimal
 
 @Immutable
@@ -8,7 +9,7 @@ sealed class ExchangeListState {
 
     @Immutable
     data class Content(
-        val exchanges: List<ExchangeState>,
+        val exchanges: ImmutableList<ExchangeState>,
     ) : ExchangeListState()
 
     data object Loading : ExchangeListState()

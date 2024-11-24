@@ -36,8 +36,8 @@ data class ExchangeResponse(
 )
 
 fun ExchangeResponse.toEntity() = ExchangeEntity(
-    id = requireNotNull(id ?: ""),
-    name = requireNotNull(name ?: ""),
+    id = requireNotNull(id),
+    name = requireNotNull(name),
     rank = requireNotNull(rank ?: ""),
     percentTotalVolume = requireNotNull(percentTotalVolume ?: BigDecimal("0.0")),
     volumeUsd = requireNotNull(volumeUsd ?: BigDecimal("0.0")),

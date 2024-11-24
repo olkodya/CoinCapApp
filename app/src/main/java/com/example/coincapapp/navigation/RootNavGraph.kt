@@ -17,9 +17,10 @@ fun RootNavGraph(navHostController: NavHostController) {
             MainScreen(navHostController)
         }
 
-        composable<Routes.ScreenDetail> {
+        composable<Routes.ScreenDetail> { backStackEntry ->
+            val id = requireNotNull(backStackEntry.toRoute<Routes.ScreenDetail>())
 //            val args = it.toRoute<Routes.ScreenDetail>()
-            DetailScreen(navHostController)
+            DetailScreen(coinId = id.coinId)
         }
     }
 }

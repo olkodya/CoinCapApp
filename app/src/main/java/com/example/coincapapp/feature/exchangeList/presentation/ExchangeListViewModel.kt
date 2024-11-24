@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.coincapapp.feature.exchangeList.domain.GetExchangeListUseCase
 import com.example.coincapapp.feature.exchangeList.domain.entities.toState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +52,8 @@ class ExchangeListViewModel @Inject constructor(
                 val exchanges: List<ExchangeState> = getExchangeListUseCase().map {
                     it.toState()
                 }
-                mutableExchangeListState.value = ExchangeListState.Content(exchanges = exchanges)
+                mutableExchangeListState.value =
+                    ExchangeListState.Content(exchanges = exchanges.toImmutableList())
             } catch (ex: Exception) {
                 mutableExchangeListState.value = ExchangeListState.Error(message = ex.message)
             }

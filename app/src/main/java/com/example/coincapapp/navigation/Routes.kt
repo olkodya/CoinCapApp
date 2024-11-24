@@ -3,7 +3,6 @@ package com.example.coincapapp.navigation
 import kotlinx.serialization.Serializable
 
 
-
 @Serializable
 sealed class Routes {
     @Serializable
@@ -11,6 +10,6 @@ sealed class Routes {
 
     @Serializable
     data class ScreenDetail(
-        val coinId: String
+        val coinId: String,
     )
 }

@@ -54,12 +54,10 @@ fun ExchangeListContent(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExchangesTopAppBar() {
     TopAppBar(title = { Text(text = "Exchanges List") })
-
 }
 
 @Composable
@@ -134,7 +132,6 @@ fun ExchangeCardPreview() {
         )
     ) {}
 }
-
 
 @Composable
 @Preview(showBackground = true)

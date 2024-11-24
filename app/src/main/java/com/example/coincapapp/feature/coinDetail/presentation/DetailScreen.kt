@@ -15,11 +15,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 
 @Composable
-fun DetailScreen(navController: NavHostController) {
-    Scaffold(topBar = { ExchangesTopAppBar(navController) }) { paddingValues ->
+fun DetailScreen(coinId: String) {
+    Scaffold(topBar = { ExchangesTopAppBar(/*navController*/) }) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -28,10 +27,10 @@ fun DetailScreen(navController: NavHostController) {
         ) {
 
             Button(onClick = {
-                navController.popBackStack()
+//                navController.popBackStack()
 
             }) {
-                Text("Back")
+                Text("Back $coinId")
             }
         }
     }
@@ -40,11 +39,11 @@ fun DetailScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExchangesTopAppBar(navController: NavHostController) {
+fun ExchangesTopAppBar(/*navController: NavHostController*/) {
     TopAppBar(
         title = { Text(text = "Name") },
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(onClick = { /*navController.popBackStack()*/ }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"

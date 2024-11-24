@@ -1,7 +1,7 @@
 package com.example.coincapapp.feature.coinList.data.model
 
-import com.example.coincapapp.utils.BigDecimalSerializer
 import com.example.coincapapp.feature.coinList.domain.entities.CoinEntity
+import com.example.coincapapp.utils.BigDecimalSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.math.BigDecimal
@@ -55,4 +55,3 @@ fun CoinResponse.toEntity() = CoinEntity(
     vwap24Hr = requireNotNull(vwap24Hr ?: ""),
     explorer = requireNotNull(explorer ?: ""),
 )
-
