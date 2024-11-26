@@ -11,5 +11,6 @@ sealed class Routes {
     @Serializable
     data class ScreenDetail(
         val coinId: String,
+        val coinName: String,
     )
 }

@@ -55,7 +55,12 @@ class CoinListViewModel @Inject constructor(
             is CoinListAction.OnSearchFieldEdited -> fieldChanged(action.query)
             is CoinListAction.OnCoinClicked -> {
                 viewModelScope.launch {
-                    mutableActions.send(CoinListEvent.NavigateToCoinDetail(action.coinId))
+                    mutableActions.send(
+                        CoinListEvent.NavigateToCoinDetail(
+                            action.coinId,
+                            action.coinName
+                        )
+                    )
                 }
             }
         }
@@ -79,10 +84,10 @@ class CoinListViewModel @Inject constructor(
 
     sealed class CoinListAction {
         data class OnSearchFieldEdited(val query: String) : CoinListAction()
-        data class OnCoinClicked(val coinId: String) : CoinListAction()
+        data class OnCoinClicked(val coinId: String, val coinName: String) : CoinListAction()
     }
 
     sealed class CoinListEvent {
-        data class NavigateToCoinDetail(val coinId: String) : CoinListEvent()
+        data class NavigateToCoinDetail(val coinId: String, val coinName: String) : CoinListEvent()
     }
 }

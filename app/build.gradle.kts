@@ -72,6 +72,9 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
 
     implementation(libs.ktor.client.serialization.jvm)
+//    implementation(libs.logback.classic)
+//    implementation("org.slf4j:slf4j-android:$slf4j_version")
+    implementation(libs.ktor.client.logging)
 
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)

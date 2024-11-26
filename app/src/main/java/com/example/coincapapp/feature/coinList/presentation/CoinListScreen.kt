@@ -8,7 +8,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 
 @Composable
 fun CoinListScreen(
-    routeToCoinDetailScreen: (String) -> Unit,
+    routeToCoinDetailScreen: (String, String) -> Unit,
 ) {
     val viewModel: CoinListViewModel = hiltViewModel()
 
@@ -16,7 +16,7 @@ fun CoinListScreen(
         viewModel.action.collect { action ->
             when (action) {
                 is CoinListViewModel.CoinListEvent.NavigateToCoinDetail -> {
-                    routeToCoinDetailScreen(action.coinId)
+                    routeToCoinDetailScreen(action.coinId, action.coinName)
                 }
             }
         }

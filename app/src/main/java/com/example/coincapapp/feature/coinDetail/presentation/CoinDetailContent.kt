@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,8 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun DetailScreen(coinId: String) {
-    Scaffold(topBar = { ExchangesTopAppBar(/*navController*/) }) { paddingValues ->
+fun CoinDetailContent(
+    state: CoinDetailState,
+    handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
+    currentPrice: String
+) {
+    Scaffold(topBar = {
+        ExchangesTopAppBar(
+            coinName = state.coinName,
+            handleAction
+        )
+    }) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -26,24 +34,28 @@ fun DetailScreen(coinId: String) {
             contentAlignment = Alignment.Center
         ) {
 
-            Button(onClick = {
-//                navController.popBackStack()
+//            Button(onClick = {
+//
+//            }) {
+//                Text("Back ${state.coinId}")
+//            }
 
-            }) {
-                Text("Back $coinId")
-            }
+            Text("Current price of ${state.coinId} = $currentPrice}")
         }
     }
-
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExchangesTopAppBar(/*navController: NavHostController*/) {
+fun ExchangesTopAppBar(
+    coinName: String,
+    handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
+) {
     TopAppBar(
-        title = { Text(text = "Name") },
+        title = { Text(text = coinName) },
         navigationIcon = {
-            IconButton(onClick = { /*navController.popBackStack()*/ }) {
+            IconButton(onClick = { handleAction(CoinDetailViewModel.CoinDetailAction.OnBackClick) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"
