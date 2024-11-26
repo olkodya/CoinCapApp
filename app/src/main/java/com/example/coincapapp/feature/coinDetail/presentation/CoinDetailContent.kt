@@ -1,6 +1,7 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -38,9 +39,14 @@ fun CoinDetailContent(
 //
 //            }) {
 //                Text("Back ${state.coinId}")
-//            }
+//            }$
 
-            Text("Current price of ${state.coinId} = $currentPrice}")
+
+            Column {
+                Text("Current price of ${state.coinId} = ${state.currentPrice}}")
+                Text("Price history:  ${state.coinPriceHistory}")
+            }
+
         }
     }
 }

@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CoinDetailViewModel @Inject constructor(
-    coinDetailRealtimeClient: CoinDetailRealtimeClient
+    private val coinDetailRealtimeClient: CoinDetailRealtimeClient
 ) : ViewModel() {
     private val mutableCoinState: MutableStateFlow<CoinDetailState> = MutableStateFlow(
         CoinDetailState("", "", "", emptyList())
@@ -48,14 +48,23 @@ class CoinDetailViewModel @Inject constructor(
 
     private fun setCoin(coinId: String, coinName: String) {
         mutableCoinState.value = coinState.value.copy(coinId = coinId, coinName = coinName)
-        getCurrentPrice()
+        getCurrentPrice(coinId)
     }
 
     private fun getCoinHistory() {
 
     }
 
-    private fun getCurrentPrice() {
+    private fun getCurrentPrice(coinId: String) {
+        viewModelScope.launch {
+            coinDetailRealtimeClient.getCoinCurrentPrice(coinId = coinId).collect { price ->
+                mutableCoinState.value = coinState.value.copy(
+                    currentPrice = price,
+                    coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
+                        .apply { add(price) })
+
+            }
+        }
 
     }
 

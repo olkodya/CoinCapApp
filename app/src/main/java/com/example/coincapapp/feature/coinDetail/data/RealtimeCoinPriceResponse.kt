@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RealtimeCoinPriceResponse(
-    @SerialName("bitcoin")
-    val bitcoin: String,
+    @SerialName("")
+    val data: Map<String, String>
 )

@@ -24,8 +24,8 @@ class CoinDetailRealtimeClientImpl @Inject constructor(
     override fun getCoinCurrentPrice(coinId: String): Flow<String> {
         return flow {
             session = client.webSocketSession {
-                url("wss://ws.coincap.io/prices?assets=bitcoin")
-//                println("wss://ws.coincap.io/prices?assets=$coinId")
+                url("wss://ws.coincap.io/prices?assets=$coinId")
+                println("wss://ws.coincap.io/prices?assets=$coinId")
             }
             val currentPrices = session!!
                 .incoming
