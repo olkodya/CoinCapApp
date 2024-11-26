@@ -19,11 +19,10 @@ fun RootNavGraph(navHostController: NavHostController) {
 
         composable<Routes.ScreenDetail> { backStackEntry ->
             val coin = requireNotNull(backStackEntry.toRoute<Routes.ScreenDetail>())
-//            val args = it.toRoute<Routes.ScreenDetail>()
-
             CoinDetailScreen(
                 coinId = coin.coinId,
-                coinName = coin.coinName
+                coinName = coin.coinName,
+                coinPrice = coin.priceUsd.toBigDecimal(),
             ) { navHostController.popBackStack() }
         }
     }

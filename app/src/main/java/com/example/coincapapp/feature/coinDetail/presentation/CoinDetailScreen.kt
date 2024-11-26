@@ -4,11 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
+import java.math.BigDecimal
 
 @Composable
 fun CoinDetailScreen(
     coinId: String,
     coinName: String,
+    coinPrice: BigDecimal,
     routeBackStack: () -> Unit
 ) {
     val viewModel: CoinDetailViewModel = hiltViewModel()
@@ -16,7 +18,8 @@ fun CoinDetailScreen(
         viewModel.handleAction(
             CoinDetailViewModel.CoinDetailAction.OnStart(
                 coinId = coinId,
-                coinName = coinName
+                coinName = coinName,
+                coinPrice = coinPrice,
             )
         )
         viewModel.action.collect { action ->
@@ -28,7 +31,5 @@ fun CoinDetailScreen(
 
     CoinDetailContent(
         viewModel.coinState.collectAsState().value,
-        { viewModel.handleAction(it) },
-        viewModel.state.collectAsState().value,
-    )
+    ) { viewModel.handleAction(it) }
 }

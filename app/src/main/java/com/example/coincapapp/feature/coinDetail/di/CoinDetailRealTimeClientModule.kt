@@ -9,7 +9,7 @@ import dagger.hilt.android.components.ViewModelComponent
 
 @InstallIn(ViewModelComponent::class)
 @Module
-interface CoinDetailRealTimeModule {
+interface CoinDetailRealTimeClientModule {
 
     @Binds
     fun bindCoinDetailRealTimeModule(impl: CoinDetailRealtimeClientImpl): CoinDetailRealtimeClient

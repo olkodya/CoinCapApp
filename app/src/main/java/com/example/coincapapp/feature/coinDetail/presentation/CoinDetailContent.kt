@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 fun CoinDetailContent(
     state: CoinDetailState,
     handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
-    currentPrice: String
 ) {
     Scaffold(topBar = {
         ExchangesTopAppBar(
@@ -34,23 +33,14 @@ fun CoinDetailContent(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-
-//            Button(onClick = {
-//
-//            }) {
-//                Text("Back ${state.coinId}")
-//            }$
-
-
             Column {
-                Text("Current price of ${state.coinId} = ${state.currentPrice}}")
+                Text("Current price of ${state.coinId} = ${state.currentPrice}")
                 Text("Price history:  ${state.coinPriceHistory}")
             }
 
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

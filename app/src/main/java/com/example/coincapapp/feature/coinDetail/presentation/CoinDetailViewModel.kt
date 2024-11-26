@@ -2,40 +2,35 @@ package com.example.coincapapp.feature.coinDetail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.coincapapp.feature.coinDetail.data.CoinDetailRealtimeClient
+import com.example.coincapapp.feature.coinDetail.domain.GetCoinCurrentPriceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 import javax.inject.Inject
-
 
 @HiltViewModel
 class CoinDetailViewModel @Inject constructor(
-    private val coinDetailRealtimeClient: CoinDetailRealtimeClient
+    private val useCase: GetCoinCurrentPriceUseCase,
 ) : ViewModel() {
+
     private val mutableCoinState: MutableStateFlow<CoinDetailState> = MutableStateFlow(
-        CoinDetailState("", "", "", emptyList())
+        CoinDetailState("", "", BigDecimal("0.0"), emptyList())
     )
     val coinState: StateFlow<CoinDetailState> = mutableCoinState.asStateFlow()
 
     private val mutableActions: Channel<CoinDetailEvent> = Channel()
     val action: Flow<CoinDetailEvent> = mutableActions.receiveAsFlow()
 
-    val state: StateFlow<String> = coinDetailRealtimeClient
-        .getCoinCurrentPrice(coinId = coinState.value.coinId)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
-
-
     fun handleAction(action: CoinDetailAction) {
         when (action) {
-            is CoinDetailAction.OnStart -> setCoin(action.coinId, action.coinName)
+            is CoinDetailAction.OnStart -> setCoin(action.coinId, action.coinName, action.coinPrice)
             CoinDetailAction.OnBackClick -> navigateToCoinListScreen()
         }
     }
@@ -46,8 +41,14 @@ class CoinDetailViewModel @Inject constructor(
         }
     }
 
-    private fun setCoin(coinId: String, coinName: String) {
-        mutableCoinState.value = coinState.value.copy(coinId = coinId, coinName = coinName)
+    private fun setCoin(coinId: String, coinName: String, price: BigDecimal) {
+        mutableCoinState.value =
+            coinState.value.copy(
+                coinId = coinId,
+                coinName = coinName,
+                currentPrice = price.setScale(2, RoundingMode.HALF_UP),
+                coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
+                    .apply { add(price.setScale(2, RoundingMode.HALF_UP)) })
         getCurrentPrice(coinId)
     }
 
@@ -57,24 +58,32 @@ class CoinDetailViewModel @Inject constructor(
 
     private fun getCurrentPrice(coinId: String) {
         viewModelScope.launch {
-            coinDetailRealtimeClient.getCoinCurrentPrice(coinId = coinId).collect { price ->
+            useCase(coinId).collect { price ->
                 mutableCoinState.value = coinState.value.copy(
-                    currentPrice = price,
+                    currentPrice = price.toBigDecimal(),
                     coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                        .apply { add(price) })
+                        .apply { add(price.toBigDecimal()) })
 
             }
         }
 
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch {
+            useCase.close()
+        }
+    }
+
     sealed class CoinDetailAction {
-        data class OnStart(val coinId: String, val coinName: String) : CoinDetailAction()
+        data class OnStart(val coinId: String, val coinName: String, val coinPrice: BigDecimal) :
+            CoinDetailAction()
+
         data object OnBackClick : CoinDetailAction()
     }
 
     sealed class CoinDetailEvent {
         data object GoBack : CoinDetailEvent()
-
     }
 }

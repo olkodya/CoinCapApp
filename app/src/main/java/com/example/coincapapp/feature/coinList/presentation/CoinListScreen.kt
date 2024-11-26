@@ -5,10 +5,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
+import java.math.BigDecimal
 
 @Composable
 fun CoinListScreen(
-    routeToCoinDetailScreen: (String, String) -> Unit,
+    routeToCoinDetailScreen: (String, String, BigDecimal) -> Unit,
 ) {
     val viewModel: CoinListViewModel = hiltViewModel()
 
@@ -16,7 +17,7 @@ fun CoinListScreen(
         viewModel.action.collect { action ->
             when (action) {
                 is CoinListViewModel.CoinListEvent.NavigateToCoinDetail -> {
-                    routeToCoinDetailScreen(action.coinId, action.coinName)
+                    routeToCoinDetailScreen(action.coinId, action.coinName, action.price)
                 }
             }
         }

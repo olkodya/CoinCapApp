@@ -85,6 +85,7 @@ fun CoinListContent(
                                     CoinListViewModel.CoinListAction.OnCoinClicked(
                                         coinId = coin.id,
                                         coinName = coin.name,
+                                        price = coin.priceUsd,
                                     )
                                 )
                             },

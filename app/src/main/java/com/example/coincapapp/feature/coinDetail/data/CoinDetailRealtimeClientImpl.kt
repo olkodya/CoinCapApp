@@ -5,6 +5,7 @@ import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.url
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -21,24 +22,23 @@ class CoinDetailRealtimeClientImpl @Inject constructor(
 ) : CoinDetailRealtimeClient {
 
     private var session: WebSocketSession? = null
-    override fun getCoinCurrentPrice(coinId: String): Flow<String> {
+
+    override suspend fun getCoinCurrentPrice(coinId: String): Flow<String> {
         return flow {
             session = client.webSocketSession {
                 url("wss://ws.coincap.io/prices?assets=$coinId")
-                println("wss://ws.coincap.io/prices?assets=$coinId")
             }
             val currentPrices = session!!
                 .incoming
                 .consumeAsFlow()
                 .filterIsInstance<Frame.Text>()
                 .mapNotNull { Json.decodeFromString<Map<String, String>>(it.readText()) }
-            emitAll(currentPrices.map { it.values.toString() })
+            emitAll(currentPrices.map { it[coinId].toString() })
         }
-
     }
 
     override suspend fun close() {
-        TODO("Not yet implemented")
+        session?.close()
+        session = null
     }
-
 }
