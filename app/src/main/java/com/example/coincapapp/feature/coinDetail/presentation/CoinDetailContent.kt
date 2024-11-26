@@ -1,9 +1,12 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +18,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.github.tehras.charts.line.LineChart
+import com.github.tehras.charts.line.LineChartData
+import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
 
 @Composable
 fun CoinDetailContent(
@@ -22,7 +30,7 @@ fun CoinDetailContent(
     handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
 ) {
     Scaffold(topBar = {
-        ExchangesTopAppBar(
+        CoinDetailTopAppBar(
             coinName = state.coinName,
             handleAction
         )
@@ -33,18 +41,23 @@ fun CoinDetailContent(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            Column {
-                Text("Current price of ${state.coinId} = ${state.currentPrice}")
-                Text("Price history:  ${state.coinPriceHistory}")
+            Column(
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+            ) {
+                Text("Current price: ${state.currentPrice} $", fontWeight = FontWeight.Bold)
+//                Text("Price history:  ${state.coinPriceHistory}")
+                Chart(state)
             }
 
         }
     }
+
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExchangesTopAppBar(
+fun CoinDetailTopAppBar(
     coinName: String,
     handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
 ) {
@@ -58,5 +71,21 @@ fun ExchangesTopAppBar(
                 )
             }
         }
+    )
+}
+
+
+@Composable
+fun Chart(state: CoinDetailState) {
+    val lineChartData = listOf(LineChartData(points = state.coinPriceHistory.map {
+        LineChartData.Point(it.toFloat(), "")
+    }, lineDrawer = SolidLineDrawer()))
+    LineChart(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .scrollable(orientation = Orientation.Horizontal, state = rememberScrollState()),
+        linesChartData = lineChartData,
+        horizontalOffset = 5f,
     )
 }
