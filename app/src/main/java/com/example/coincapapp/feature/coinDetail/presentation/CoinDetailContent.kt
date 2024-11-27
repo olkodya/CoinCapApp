@@ -1,11 +1,11 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -83,8 +83,9 @@ fun Chart(state: CoinDetailState) {
     LineChart(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
-            .scrollable(orientation = Orientation.Horizontal, state = rememberScrollState()),
+            .horizontalScroll(rememberScrollState())
+            .width(1600.dp)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
         linesChartData = lineChartData,
         horizontalOffset = 5f,
     )
