@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CoinDetailViewModel @Inject constructor(
     private val currentPriceUseCase: GetCoinCurrentPriceUseCase,
-    private val historyUseCase: GetCoinPriceHistoryUseCase
+    private val historyUseCase: GetCoinPriceHistoryUseCase,
 ) : ViewModel() {
 
     private val mutableCoinState: MutableStateFlow<CoinDetailState> = MutableStateFlow(
@@ -50,32 +50,25 @@ class CoinDetailViewModel @Inject constructor(
                 coinName = coinName,
                 currentPrice = price.setScale(2, RoundingMode.HALF_UP),
             )
-        getCoinHistory(coinId)
-        getCurrentPrice(coinId)
+        getCoinPriceHistory(coinId)
     }
 
-    private fun getCoinHistory(coinId: String) {
+    private fun getCoinPriceHistory(coinId: String) {
         viewModelScope.launch {
-            val history = historyUseCase(coinId = coinId).data.map { it.priceUsd }
+
+        val history = historyUseCase(coinId = coinId).data.map { it.priceUsd }
             println("history: $history")
             mutableCoinState.value = coinState.value.copy(
                 coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
                     .apply { addAll(history) })
 
-        }
-    }
-
-    private fun getCurrentPrice(coinId: String) {
-        viewModelScope.launch {
             currentPriceUseCase(coinId).collect { price ->
                 mutableCoinState.value = coinState.value.copy(
                     currentPrice = price.toBigDecimal(),
                     coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
                         .apply { add(price.toBigDecimal()) })
-
             }
         }
-
     }
 
     override fun onCleared() {

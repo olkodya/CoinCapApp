@@ -7,6 +7,7 @@ import javax.inject.Inject
 class GetCoinPriceHistoryUseCaseImpl @Inject constructor(
     private val repository: CoinDetailRepository
 ) : GetCoinPriceHistoryUseCase {
+
     override suspend fun invoke(coinId: String): CoinDetailListResponse =
         repository.getCoinPricesHistory(coinId)
 }

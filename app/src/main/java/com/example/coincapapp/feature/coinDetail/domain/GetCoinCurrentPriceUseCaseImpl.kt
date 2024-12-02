@@ -12,4 +12,3 @@ class GetCoinCurrentPriceUseCaseImpl @Inject constructor(
 
     override suspend fun close() = client.close()
 }
-

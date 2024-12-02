@@ -31,8 +31,7 @@ fun CoinDetailContent(
 ) {
     Scaffold(topBar = {
         CoinDetailTopAppBar(
-            coinName = state.coinName,
-            handleAction
+            coinName = state.coinName, handleAction
         )
     }) { paddingValues ->
         Box(
@@ -42,17 +41,13 @@ fun CoinDetailContent(
             contentAlignment = Alignment.Center
         ) {
             Column(
-                modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp)
             ) {
                 Text("Current price: ${state.currentPrice} $", fontWeight = FontWeight.Bold)
-//                Text("Price history:  ${state.coinPriceHistory}")
                 Chart(state)
             }
-
         }
     }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,17 +56,13 @@ fun CoinDetailTopAppBar(
     coinName: String,
     handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
 ) {
-    TopAppBar(
-        title = { Text(text = coinName) },
-        navigationIcon = {
-            IconButton(onClick = { handleAction(CoinDetailViewModel.CoinDetailAction.OnBackClick) }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
+    TopAppBar(title = { Text(text = coinName) }, navigationIcon = {
+        IconButton(onClick = { handleAction(CoinDetailViewModel.CoinDetailAction.OnBackClick) }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
+            )
         }
-    )
+    })
 }
 
 
@@ -85,7 +76,7 @@ fun Chart(state: CoinDetailState) {
             .fillMaxSize()
             .horizontalScroll(rememberScrollState())
             .width(1600.dp)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
+            .padding(horizontal = 8.dp, vertical = 32.dp),
         linesChartData = lineChartData,
         horizontalOffset = 5f,
     )

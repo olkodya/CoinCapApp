@@ -14,9 +14,7 @@ class CoinDetailRepositoryImpl @Inject constructor(
     override suspend fun getCoinPricesHistory(coinId: String): CoinDetailListResponse =
         client.get("assets/${coinId}/history")
         {
-            parameter("id", coinId)
             parameter("interval", "m1")
-
         }
             .body()
 }
