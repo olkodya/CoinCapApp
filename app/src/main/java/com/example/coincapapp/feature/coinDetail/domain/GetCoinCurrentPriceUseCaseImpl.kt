@@ -7,6 +7,7 @@ import javax.inject.Inject
 class GetCoinCurrentPriceUseCaseImpl @Inject constructor(
     private val client: CoinDetailRealtimeClient
 ) : GetCoinCurrentPriceUseCase {
+
     override suspend fun invoke(coinId: String): Flow<String> =
         client.getCoinCurrentPrice(coinId = coinId)
 

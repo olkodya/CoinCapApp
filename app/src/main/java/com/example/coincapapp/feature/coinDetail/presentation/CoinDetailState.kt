@@ -8,5 +8,12 @@ data class CoinDetailState(
     val coinId: String,
     val coinName: String,
     val currentPrice: BigDecimal,
-    val coinPriceHistory: List<BigDecimal>
-)
+    val coinPriceHistory: List<BigDecimal> = emptyList(),
+    val loading: Boolean = false,
+    val error: String? = null
+) {
+    val isLoading: Boolean
+        get() = loading
+    val hasError: String?
+        get() = error
+}

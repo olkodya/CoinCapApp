@@ -18,8 +18,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.coincapapp.R
+import com.example.coincapapp.components.ErrorState
+import com.example.coincapapp.components.LoadingState
 import com.github.tehras.charts.line.LineChart
 import com.github.tehras.charts.line.LineChartData
 import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
@@ -44,7 +48,32 @@ fun CoinDetailContent(
                 modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp)
             ) {
                 Text("Current price: ${state.currentPrice} $", fontWeight = FontWeight.Bold)
-                Chart(state)
+                when {
+                    state.isLoading -> {
+                        LoadingState(Modifier.fillMaxSize())
+                    }
+
+                    state.hasError != null -> {
+                        ErrorState(
+                            Modifier.fillMaxSize(),
+                            message = state.hasError ?: stringResource(R.string.error_string),
+                        ) {
+                            handleAction(
+                                CoinDetailViewModel.CoinDetailAction.OnRetryClick(
+                                    state.coinId,
+                                    state.coinName,
+                                    state.currentPrice
+                                )
+                            )
+                        }
+
+                    }
+
+                    state.coinPriceHistory.isNotEmpty() -> {
+                        Chart(state)
+                    }
+                }
+
             }
         }
     }
@@ -80,4 +109,10 @@ fun Chart(state: CoinDetailState) {
         linesChartData = lineChartData,
         horizontalOffset = 5f,
     )
+}
+
+
+@Composable
+fun ChartPreview() {
+
 }

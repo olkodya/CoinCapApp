@@ -34,6 +34,11 @@ class CoinDetailViewModel @Inject constructor(
         when (action) {
             is CoinDetailAction.OnStart -> setCoin(action.coinId, action.coinName, action.coinPrice)
             CoinDetailAction.OnBackClick -> navigateToCoinListScreen()
+            is CoinDetailAction.OnRetryClick -> setCoin(
+                action.coinId,
+                action.coinName,
+                action.coinPrice
+            )
         }
     }
 
@@ -55,19 +60,36 @@ class CoinDetailViewModel @Inject constructor(
 
     private fun getCoinPriceHistory(coinId: String) {
         viewModelScope.launch {
+            try {
+                mutableCoinState.value =
+                    coinState.value.copy(
+                        loading = true,
+                        coinPriceHistory = emptyList(),
+                        error = null
+                    )
+                val history = historyUseCase(coinId = coinId).data.map { it.priceUsd }
 
-        val history = historyUseCase(coinId = coinId).data.map { it.priceUsd }
-            println("history: $history")
-            mutableCoinState.value = coinState.value.copy(
-                coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                    .apply { addAll(history) })
-
-            currentPriceUseCase(coinId).collect { price ->
                 mutableCoinState.value = coinState.value.copy(
-                    currentPrice = price.toBigDecimal(),
                     coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                        .apply { add(price.toBigDecimal()) })
+                        .apply { addAll(history) },
+                    loading = false,
+                    error = null
+                )
+
+                currentPriceUseCase(coinId).collect { price ->
+                    mutableCoinState.value = coinState.value.copy(
+                        currentPrice = price.toBigDecimal(),
+                        coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
+                            .apply { add(price.toBigDecimal()) })
+                }
+            } catch (ex: Exception) {
+                mutableCoinState.value = coinState.value.copy(
+                    loading = false,
+                    coinPriceHistory = emptyList(),
+                    error = ex.message.toString()
+                )
             }
+
         }
     }
 
@@ -79,10 +101,18 @@ class CoinDetailViewModel @Inject constructor(
     }
 
     sealed class CoinDetailAction {
-        data class OnStart(val coinId: String, val coinName: String, val coinPrice: BigDecimal) :
-            CoinDetailAction()
+        data class OnStart(
+            val coinId: String,
+            val coinName: String,
+            val coinPrice: BigDecimal
+        ) : CoinDetailAction()
 
         data object OnBackClick : CoinDetailAction()
+        data class OnRetryClick(
+            val coinId: String,
+            val coinName: String,
+            val coinPrice: BigDecimal
+        ) : CoinDetailAction()
     }
 
     sealed class CoinDetailEvent {
