@@ -1,12 +1,10 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
@@ -27,6 +26,7 @@ import com.example.coincapapp.components.LoadingState
 import com.github.tehras.charts.line.LineChart
 import com.github.tehras.charts.line.LineChartData
 import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
+import java.math.BigDecimal
 
 @Composable
 fun CoinDetailContent(
@@ -47,26 +47,31 @@ fun CoinDetailContent(
             Column(
                 modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp)
             ) {
-                Text("Current price: ${state.currentPrice} $", fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.current_price, state.currentPrice),
+                    fontWeight = FontWeight.Bold
+                )
                 when {
+
                     state.isLoading -> {
                         LoadingState(Modifier.fillMaxSize())
                     }
 
                     state.hasError != null -> {
-                        ErrorState(
-                            Modifier.fillMaxSize(),
-                            message = state.hasError ?: stringResource(R.string.error_string),
-                        ) {
-                            handleAction(
-                                CoinDetailViewModel.CoinDetailAction.OnRetryClick(
-                                    state.coinId,
-                                    state.coinName,
-                                    state.currentPrice
+                        (if (state.hasError.equals("null")) stringResource(R.string.error_string) else state.hasError)?.let {
+                            ErrorState(
+                                Modifier.fillMaxSize(),
+                                message = it,
+                            ) {
+                                handleAction(
+                                    CoinDetailViewModel.CoinDetailAction.OnRetryClick(
+                                        state.coinId,
+                                        state.coinName,
+                                        state.currentPrice
+                                    )
                                 )
-                            )
+                            }
                         }
-
                     }
 
                     state.coinPriceHistory.isNotEmpty() -> {
@@ -94,7 +99,6 @@ fun CoinDetailTopAppBar(
     })
 }
 
-
 @Composable
 fun Chart(state: CoinDetailState) {
     val lineChartData = listOf(LineChartData(points = state.coinPriceHistory.map {
@@ -103,7 +107,7 @@ fun Chart(state: CoinDetailState) {
     LineChart(
         modifier = Modifier
             .fillMaxSize()
-            .horizontalScroll(rememberScrollState())
+//            .horizontalScroll(rememberScrollState())
             .width(1600.dp)
             .padding(horizontal = 8.dp, vertical = 32.dp),
         linesChartData = lineChartData,
@@ -111,8 +115,53 @@ fun Chart(state: CoinDetailState) {
     )
 }
 
+@Composable
+@Preview(showBackground = true)
+fun CoinDetailChartPreview() {
+    val state = CoinDetailState(
+        coinId = "bitcoin",
+        coinName = "Bitcoin",
+        coinPriceHistory = listOf(
+            BigDecimal("95000.46"),
+            BigDecimal("95000.43"),
+            BigDecimal("95000.42"),
+            BigDecimal("95001.42"),
+            BigDecimal("95002.38"),
+            BigDecimal("95000.41"),
+            BigDecimal("95000.42"),
+            BigDecimal("95000.42"),
+        ),
+        currentPrice = BigDecimal("95000.0"),
+        loading = false,
+        errorMessage = null
+    )
+    CoinDetailContent(state) {}
+}
 
 @Composable
-fun ChartPreview() {
+@Preview(showBackground = true)
+fun CoinDetailErrorStatePreview() {
+    val state = CoinDetailState(
+        coinId = "bitcoin",
+        coinName = "Bitcoin",
+        coinPriceHistory = emptyList(),
+        currentPrice = BigDecimal("95000.0"),
+        loading = false,
+        errorMessage = "Error"
+    )
+    CoinDetailContent(state) {}
+}
 
+@Composable
+@Preview(showBackground = true)
+fun CoinDetailLoadingStatePreview() {
+    val state = CoinDetailState(
+        coinId = "bitcoin",
+        coinName = "Bitcoin",
+        coinPriceHistory = emptyList(),
+        currentPrice = BigDecimal("95000.0"),
+        loading = true,
+        errorMessage = null
+    )
+    CoinDetailContent(state) {}
 }

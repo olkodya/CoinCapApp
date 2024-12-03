@@ -32,7 +32,12 @@ class CoinDetailViewModel @Inject constructor(
 
     fun handleAction(action: CoinDetailAction) {
         when (action) {
-            is CoinDetailAction.OnStart -> setCoin(action.coinId, action.coinName, action.coinPrice)
+            is CoinDetailAction.OnStart -> setCoin(
+                action.coinId,
+                action.coinName,
+                action.coinPrice
+            )
+
             CoinDetailAction.OnBackClick -> navigateToCoinListScreen()
             is CoinDetailAction.OnRetryClick -> setCoin(
                 action.coinId,
@@ -65,7 +70,7 @@ class CoinDetailViewModel @Inject constructor(
                     coinState.value.copy(
                         loading = true,
                         coinPriceHistory = emptyList(),
-                        error = null
+                        errorMessage = null
                     )
                 val history = historyUseCase(coinId = coinId).data.map { it.priceUsd }
 
@@ -73,7 +78,7 @@ class CoinDetailViewModel @Inject constructor(
                     coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
                         .apply { addAll(history) },
                     loading = false,
-                    error = null
+                    errorMessage = null
                 )
 
                 currentPriceUseCase(coinId).collect { price ->
@@ -86,7 +91,7 @@ class CoinDetailViewModel @Inject constructor(
                 mutableCoinState.value = coinState.value.copy(
                     loading = false,
                     coinPriceHistory = emptyList(),
-                    error = ex.message.toString()
+                    errorMessage = ex.message.toString()
                 )
             }
 
