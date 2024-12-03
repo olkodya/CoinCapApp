@@ -14,19 +14,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.tehras.charts.line.LineChart
 import com.github.tehras.charts.line.LineChartData
 import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
 import java.math.BigDecimal
+import java.text.DecimalFormat
 
 @Composable
 fun CoinDetailContent(
@@ -75,7 +85,7 @@ fun CoinDetailContent(
                     }
 
                     state.coinPriceHistory.isNotEmpty() -> {
-                        Chart(state)
+                        Chart2(state)
                     }
                 }
 
@@ -113,6 +123,127 @@ fun Chart(state: CoinDetailState) {
         linesChartData = lineChartData,
         horizontalOffset = 5f,
     )
+}
+
+
+@Composable
+fun Chart2(state: CoinDetailState) {
+    LineGraph(
+        yData = state.coinPriceHistory.map { it.toFloat() },
+        xData = (0..state.coinPriceHistory.size).toList().map { it.toFloat() },
+        dataLabel = "${state.coinName} price",
+        modifier = Modifier.fillMaxSize(),
+    )
+}
+
+
+@Composable
+fun LineGraph(
+    xData: List<Float>,
+    yData: List<Float>,
+    dataLabel: String,
+    modifier: Modifier = Modifier
+) {
+
+    var currentXPosition by remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
+    AndroidView(
+        modifier = modifier.fillMaxSize(),
+        factory = { context ->
+            val chart = LineChart(context)
+            val entries: List<Entry> =
+                xData.zip(yData) { x, y -> Entry(x, y) }  // Convert the x and y data into entries
+            val dataSet = LineDataSet(entries, dataLabel).apply {
+                lineWidth = 4f
+                circleRadius = 6f // Установка размера точек (радиус)
+            }  // Create a dataset of entries
+            chart.data = LineData(dataSet)  // Pass the dataset to the chart
+            if (xData.size > 3) {
+                currentXPosition =
+                    xData.size - 3.toFloat() // Устанавливаем положение на последние 20 точек
+            } else {
+                currentXPosition = 0f // Если точек меньше 20, показываем все
+            }
+            chart.setTouchEnabled(true)
+            chart.isDragEnabled = true
+            chart.isScaleXEnabled = false
+            chart.isScaleYEnabled = false
+            chart.invalidate()
+            chart
+
+        },
+        update = { view ->
+            val entries: List<Entry> =
+                xData.zip(yData) { x, y -> Entry(x, y) }
+            val dataSet = LineDataSet(entries, dataLabel).apply {
+                lineWidth = 4f
+                valueTextSize = 14f
+                circleRadius = 6f // Установка размера точек (радиус)
+                valueFormatter = DecimalValueFormatter()
+            }
+            view.data = LineData(dataSet)
+            view.setVisibleXRange(2f, 3f)
+            if (xData.size > 3) {
+                currentXPosition =
+                    xData.size - 3.toFloat() // Устанавливаем положение на последние 20 точек
+            } else {
+                currentXPosition = 0f // Если точек меньше 20, показываем все
+            }
+            view.moveViewToX(currentXPosition)
+            view.invalidate()
+        }
+    )
+}
+
+
+@Composable
+fun CandleCHart(
+    xData: List<Float>,
+    yData: List<Float>,
+    dataLabel: String,
+    modifier: Modifier = Modifier
+) {
+//
+//    var currentXPosition by remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
+//    AndroidView(
+//        modifier = modifier.fillMaxSize(),
+//        factory = { context ->
+//            val chart = CandleStickChart(context)  // Initialise the chart
+//            val entries: List<CandleEntry> =
+//                xData.zip(yData) { x, y -> CandleEntry(x, y) }
+//            // Convert the x and y data into entries
+//            val dataSet = CandleDataSet(entries, dataLabel)  // Create a dataset of entries
+//
+//
+//
+//
+//
+//            chart.data = CandleEntry(dataSet, )  // Pass the dataset to the chart
+//            chart.moveViewToX(xData[xData.size - 10])
+//
+//            chart.setTouchEnabled(true)
+//            chart.isDragEnabled = true
+//            chart.isScaleXEnabled = false
+//            chart.isScaleYEnabled = false
+//            chart.invalidate()
+//            chart
+//
+//        },
+//        update = { view ->
+//            val entries: List<Entry> =
+//                xData.zip(yData) { x, y -> Entry(x, y) }
+//            val dataSet = LineDataSet(entries, dataLabel)
+//            view.data = LineData(dataSet)
+//            view.setVisibleXRange(10F, 15f);
+//            if (xData.size > 15) {
+//                currentXPosition =
+//                    xData.size - 15.toFloat() // Устанавливаем положение на последние 20 точек
+//            } else {
+//                currentXPosition = 0f // Если точек меньше 20, показываем все
+//            }
+//            view.moveViewToX(currentXPosition)
+//            view.invalidate()
+//        }
+//    )
 }
 
 @Composable
@@ -164,4 +295,12 @@ fun CoinDetailLoadingStatePreview() {
         errorMessage = null
     )
     CoinDetailContent(state) {}
+}
+
+class DecimalValueFormatter : ValueFormatter() {
+    private val format = DecimalFormat("#.##") // Формат с двумя знаками после запятой
+
+    override fun getPointLabel(entry: Entry?): String {
+        return format.format(entry?.y ?: 0f) // Форматируем значение Y
+    }
 }
