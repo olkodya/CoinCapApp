@@ -59,7 +59,7 @@ class CoinDetailViewModel @Inject constructor(
             coinState.value.copy(
                 coinId = coinId,
                 coinName = coinName,
-                currentPrice = price.setScale(2, RoundingMode.HALF_UP),
+                currentPrice = price.setScale(5, RoundingMode.HALF_UP),
             )
         getCoinPriceHistory(coinId)
     }
@@ -73,11 +73,12 @@ class CoinDetailViewModel @Inject constructor(
                         coinPriceHistory = emptyList(),
                         errorMessage = null
                     )
-                val history = historyUseCase(coinId = coinId).map { it.toState() }
+                val history =
+                    historyUseCase(coinId = coinId)
 
                 mutableCoinState.value = coinState.value.copy(
                     coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                        .apply { addAll(history) },
+                        .apply { addAll(history.map { it.toState() }) },
                     loading = false,
                     errorMessage = null
                 )
@@ -86,7 +87,10 @@ class CoinDetailViewModel @Inject constructor(
                     mutableCoinState.value = coinState.value.copy(
                         currentPrice = price.priceUsd,
                         coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                            .apply { add(price.toState()) })
+                            .apply { add(price.toState(coinState.value.coinPriceHistory.size.toFloat())) },
+                        loading = false,
+                        errorMessage = null
+                    )
                 }
             } catch (ex: Exception) {
                 mutableCoinState.value = coinState.value.copy(

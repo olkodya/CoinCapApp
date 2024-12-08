@@ -11,7 +11,7 @@ class GetCoinCurrentPriceUseCaseImpl @Inject constructor(
 ) : GetCoinCurrentPriceUseCase {
 
     override suspend fun invoke(coinId: String): Flow<CoinDetailEntity> =
-        client.getCoinCurrentPrice(coinId = coinId).map { it.toEntity() }
+        client.getCoinCurrentPrice(coinId = coinId).map { it.toEntity(0) }
 
     override suspend fun close() = client.close()
 }

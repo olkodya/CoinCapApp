@@ -29,9 +29,11 @@ import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
 import com.example.coincapapp.utils.DecimalValueFormatter
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.tehras.charts.line.LineChart
 import com.github.tehras.charts.line.LineChartData
 import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
@@ -117,7 +119,7 @@ fun Chart(state: CoinDetailScreenState) {
         modifier = Modifier
             .fillMaxSize()
             .width(1600.dp)
-            .padding(horizontal = 8.dp, vertical = 32.dp),
+            .padding(vertical = 32.dp),
         linesChartData = lineChartData,
         horizontalOffset = 5f,
     )
@@ -126,10 +128,13 @@ fun Chart(state: CoinDetailScreenState) {
 
 @Composable
 fun Chart2(state: CoinDetailScreenState) {
+    println(state.coinPriceHistory.reversed())
     LineGraph(
-        yData = state.coinPriceHistory.map { it.priceUsd.toFloat() },
-        xData = (0..state.coinPriceHistory.size).toList().map { it.toFloat() },
+        yData = state.coinPriceHistory.map { it.priceUsd },
+//        xData = (0..state.coinPriceHistory.size).toList().map { it.toFloat() },
+        xData = state.coinPriceHistory.map { it.xValue },
         dataLabel = "${state.coinName} price",
+        xLabels = state.coinPriceHistory.map { it.time },
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp, vertical = 32.dp),
@@ -138,10 +143,12 @@ fun Chart2(state: CoinDetailScreenState) {
 }
 
 
+
 @Composable
 fun LineGraph(
     xData: List<Float>,
     yData: List<Float>,
+    xLabels: List<String>,
     dataLabel: String,
     modifier: Modifier = Modifier
 ) {
@@ -165,10 +172,15 @@ fun LineGraph(
             } else {
                 0f
             }
+            chart.setExtraOffsets(10f, 10f, 10f, 10f)
             chart.setTouchEnabled(true)
             chart.isDragEnabled = true
+            chart.description.isEnabled = false
             chart.isScaleXEnabled = false
+            chart.axisLeft.isEnabled = false
             chart.isScaleYEnabled = false
+            chart.xAxis.setDrawGridLines(false)
+            chart.xAxis.valueFormatter = IndexAxisValueFormatter(xLabels)
             chart.invalidate()
             chart
         },
@@ -180,6 +192,17 @@ fun LineGraph(
                 valueTextSize = 14f
                 circleRadius = 6f
                 valueFormatter = DecimalValueFormatter()
+            }
+            view.xAxis.valueFormatter = IndexAxisValueFormatter(xLabels)
+
+            view.xAxis.apply {
+                textSize = 12f
+                position = XAxis.XAxisPosition.BOTTOM
+            }
+
+            view.axisRight.apply {
+                textSize = 12f
+
             }
             view.data = LineData(dataSet)
             view.setVisibleXRange(2f, 3f)
@@ -195,56 +218,6 @@ fun LineGraph(
 }
 
 
-@Composable
-fun CandleCHart(
-    xData: List<Float>,
-    yData: List<Float>,
-    dataLabel: String,
-    modifier: Modifier = Modifier
-) {
-//
-//    var currentXPosition by remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
-//    AndroidView(
-//        modifier = modifier.fillMaxSize(),
-//        factory = { context ->
-//            val chart = CandleStickChart(context)  // Initialise the chart
-//            val entries: List<CandleEntry> =
-//                xData.zip(yData) { x, y -> CandleEntry(x, y) }
-//            // Convert the x and y data into entries
-//            val dataSet = CandleDataSet(entries, dataLabel)  // Create a dataset of entries
-//
-//
-//
-//
-//
-//            chart.data = CandleEntry(dataSet, )  // Pass the dataset to the chart
-//            chart.moveViewToX(xData[xData.size - 10])
-//
-//            chart.setTouchEnabled(true)
-//            chart.isDragEnabled = true
-//            chart.isScaleXEnabled = false
-//            chart.isScaleYEnabled = false
-//            chart.invalidate()
-//            chart
-//
-//        },
-//        update = { view ->
-//            val entries: List<Entry> =
-//                xData.zip(yData) { x, y -> Entry(x, y) }
-//            val dataSet = LineDataSet(entries, dataLabel)
-//            view.data = LineData(dataSet)
-//            view.setVisibleXRange(10F, 15f);
-//            if (xData.size > 15) {
-//                currentXPosition =
-//                    xData.size - 15.toFloat() // Устанавливаем положение на последние 20 точек
-//            } else {
-//                currentXPosition = 0f // Если точек меньше 20, показываем все
-//            }
-//            view.moveViewToX(currentXPosition)
-//            view.invalidate()
-//        }
-//    )
-}
 
 @Composable
 @Preview(showBackground = true)
@@ -253,11 +226,10 @@ fun CoinDetailChartPreview() {
         coinId = "bitcoin",
         coinName = "Bitcoin",
         coinPriceHistory = listOf(
-            CoinDetailState(BigDecimal("95000.43"), 0),
-            CoinDetailState(BigDecimal("95000.43"), 0),
-            CoinDetailState(BigDecimal("95000.43"), 0),
-            CoinDetailState(BigDecimal("95000.43"), 0),
-            CoinDetailState(BigDecimal("95000.43"), 0)
+            CoinDetailState(95000.43F, 0F, "00:38:00"),
+            CoinDetailState(95000.41F, 1F, "00:38:05"),
+            CoinDetailState(95001.43F, 2F, "00:38:10"),
+            CoinDetailState(95001.02F, 3F, "00:38:15"),
         ),
         currentPrice = BigDecimal("95000.0"),
         loading = false,

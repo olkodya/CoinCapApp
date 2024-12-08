@@ -17,7 +17,8 @@ data class CoinDetailScreenState(
 }
 
 data class CoinDetailState(
-    val priceUsd: BigDecimal,
-    val time: Long,
+    val priceUsd: Float,
+    val xValue: Float,
+    val time: String,
 )
 

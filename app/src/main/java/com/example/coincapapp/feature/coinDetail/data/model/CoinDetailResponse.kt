@@ -18,8 +18,9 @@ data class CoinDetailListResponse(
     val data: List<CoinDetailResponse> = emptyList()
 )
 
-fun CoinDetailResponse.toEntity() =
+fun CoinDetailResponse.toEntity(xValue: Int) =
     CoinDetailEntity(
         priceUsd = priceUsd,
-        time = time
+        time = time,
+        xValues = xValue
     )
