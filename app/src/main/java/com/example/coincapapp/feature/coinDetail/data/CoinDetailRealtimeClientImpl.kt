@@ -1,5 +1,6 @@
 package com.example.coincapapp.feature.coinDetail.data
 
+import com.example.coincapapp.feature.coinDetail.data.model.CoinDetailResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.url
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.json.Json
+import java.math.BigDecimal
 import javax.inject.Inject
 
 class CoinDetailRealtimeClientImpl @Inject constructor(
@@ -23,7 +25,7 @@ class CoinDetailRealtimeClientImpl @Inject constructor(
 
     private var session: WebSocketSession? = null
 
-    override suspend fun getCoinCurrentPrice(coinId: String): Flow<String> {
+    override suspend fun getCoinCurrentPrice(coinId: String): Flow<CoinDetailResponse> {
         return flow {
             session = client.webSocketSession {
                 url("wss://ws.coincap.io/prices?assets=$coinId")
@@ -33,7 +35,12 @@ class CoinDetailRealtimeClientImpl @Inject constructor(
                 .consumeAsFlow()
                 .filterIsInstance<Frame.Text>()
                 .mapNotNull { Json.decodeFromString<Map<String, String>>(it.readText()) }
-            emitAll(currentPrices.map { it[coinId].toString() })
+            emitAll(currentPrices.map {
+                CoinDetailResponse(
+                    priceUsd = it[coinId]?.toBigDecimal() ?: BigDecimal("0.0"),
+                    time = System.currentTimeMillis()
+                )
+            })
         }
     }
 

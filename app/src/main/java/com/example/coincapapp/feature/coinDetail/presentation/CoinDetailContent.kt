@@ -27,20 +27,19 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
+import com.example.coincapapp.utils.DecimalValueFormatter
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.tehras.charts.line.LineChart
 import com.github.tehras.charts.line.LineChartData
 import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
 import java.math.BigDecimal
-import java.text.DecimalFormat
 
 @Composable
 fun CoinDetailContent(
-    state: CoinDetailState,
+    state: CoinDetailScreenState,
     handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
 ) {
     Scaffold(topBar = {
@@ -110,14 +109,13 @@ fun CoinDetailTopAppBar(
 }
 
 @Composable
-fun Chart(state: CoinDetailState) {
+fun Chart(state: CoinDetailScreenState) {
     val lineChartData = listOf(LineChartData(points = state.coinPriceHistory.map {
-        LineChartData.Point(it.toFloat(), "")
+        LineChartData.Point(it.priceUsd.toFloat(), "")
     }, lineDrawer = SolidLineDrawer()))
     LineChart(
         modifier = Modifier
             .fillMaxSize()
-//            .horizontalScroll(rememberScrollState())
             .width(1600.dp)
             .padding(horizontal = 8.dp, vertical = 32.dp),
         linesChartData = lineChartData,
@@ -127,13 +125,16 @@ fun Chart(state: CoinDetailState) {
 
 
 @Composable
-fun Chart2(state: CoinDetailState) {
+fun Chart2(state: CoinDetailScreenState) {
     LineGraph(
-        yData = state.coinPriceHistory.map { it.toFloat() },
+        yData = state.coinPriceHistory.map { it.priceUsd.toFloat() },
         xData = (0..state.coinPriceHistory.size).toList().map { it.toFloat() },
         dataLabel = "${state.coinName} price",
-        modifier = Modifier.fillMaxSize(),
-    )
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp, vertical = 32.dp),
+
+        )
 }
 
 
@@ -151,17 +152,18 @@ fun LineGraph(
         factory = { context ->
             val chart = LineChart(context)
             val entries: List<Entry> =
-                xData.zip(yData) { x, y -> Entry(x, y) }  // Convert the x and y data into entries
+                xData.zip(yData) { x, y -> Entry(x, y) }
+            println(entries)
+            println(entries.size)
             val dataSet = LineDataSet(entries, dataLabel).apply {
                 lineWidth = 4f
-                circleRadius = 6f // Установка размера точек (радиус)
-            }  // Create a dataset of entries
-            chart.data = LineData(dataSet)  // Pass the dataset to the chart
-            if (xData.size > 3) {
-                currentXPosition =
-                    xData.size - 3.toFloat() // Устанавливаем положение на последние 20 точек
+                circleRadius = 6f
+            }
+            chart.data = LineData(dataSet)
+            currentXPosition = if (xData.size > 3) {
+                xData.size - 3.toFloat()
             } else {
-                currentXPosition = 0f // Если точек меньше 20, показываем все
+                0f
             }
             chart.setTouchEnabled(true)
             chart.isDragEnabled = true
@@ -169,7 +171,6 @@ fun LineGraph(
             chart.isScaleYEnabled = false
             chart.invalidate()
             chart
-
         },
         update = { view ->
             val entries: List<Entry> =
@@ -177,16 +178,15 @@ fun LineGraph(
             val dataSet = LineDataSet(entries, dataLabel).apply {
                 lineWidth = 4f
                 valueTextSize = 14f
-                circleRadius = 6f // Установка размера точек (радиус)
+                circleRadius = 6f
                 valueFormatter = DecimalValueFormatter()
             }
             view.data = LineData(dataSet)
             view.setVisibleXRange(2f, 3f)
-            if (xData.size > 3) {
-                currentXPosition =
-                    xData.size - 3.toFloat() // Устанавливаем положение на последние 20 точек
+            currentXPosition = if (xData.size > 3) {
+                xData.size - 3.toFloat()
             } else {
-                currentXPosition = 0f // Если точек меньше 20, показываем все
+                0f
             }
             view.moveViewToX(currentXPosition)
             view.invalidate()
@@ -249,18 +249,15 @@ fun CandleCHart(
 @Composable
 @Preview(showBackground = true)
 fun CoinDetailChartPreview() {
-    val state = CoinDetailState(
+    val state = CoinDetailScreenState(
         coinId = "bitcoin",
         coinName = "Bitcoin",
         coinPriceHistory = listOf(
-            BigDecimal("95000.46"),
-            BigDecimal("95000.43"),
-            BigDecimal("95000.42"),
-            BigDecimal("95001.42"),
-            BigDecimal("95002.38"),
-            BigDecimal("95000.41"),
-            BigDecimal("95000.42"),
-            BigDecimal("95000.42"),
+            CoinDetailState(BigDecimal("95000.43"), 0),
+            CoinDetailState(BigDecimal("95000.43"), 0),
+            CoinDetailState(BigDecimal("95000.43"), 0),
+            CoinDetailState(BigDecimal("95000.43"), 0),
+            CoinDetailState(BigDecimal("95000.43"), 0)
         ),
         currentPrice = BigDecimal("95000.0"),
         loading = false,
@@ -272,7 +269,7 @@ fun CoinDetailChartPreview() {
 @Composable
 @Preview(showBackground = true)
 fun CoinDetailErrorStatePreview() {
-    val state = CoinDetailState(
+    val state = CoinDetailScreenState(
         coinId = "bitcoin",
         coinName = "Bitcoin",
         coinPriceHistory = emptyList(),
@@ -286,7 +283,7 @@ fun CoinDetailErrorStatePreview() {
 @Composable
 @Preview(showBackground = true)
 fun CoinDetailLoadingStatePreview() {
-    val state = CoinDetailState(
+    val state = CoinDetailScreenState(
         coinId = "bitcoin",
         coinName = "Bitcoin",
         coinPriceHistory = emptyList(),
@@ -297,10 +294,3 @@ fun CoinDetailLoadingStatePreview() {
     CoinDetailContent(state) {}
 }
 
-class DecimalValueFormatter : ValueFormatter() {
-    private val format = DecimalFormat("#.##") // Формат с двумя знаками после запятой
-
-    override fun getPointLabel(entry: Entry?): String {
-        return format.format(entry?.y ?: 0f) // Форматируем значение Y
-    }
-}

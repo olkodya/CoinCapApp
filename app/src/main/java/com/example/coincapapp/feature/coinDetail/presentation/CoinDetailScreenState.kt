@@ -2,11 +2,11 @@ package com.example.coincapapp.feature.coinDetail.presentation
 
 import java.math.BigDecimal
 
-data class CoinDetailState(
+data class CoinDetailScreenState(
     val coinId: String,
     val coinName: String,
     val currentPrice: BigDecimal,
-    val coinPriceHistory: List<BigDecimal> = emptyList(),
+    val coinPriceHistory: List<CoinDetailState> = emptyList(),
     val loading: Boolean = false,
     val errorMessage: String? = null
 ) {
@@ -15,3 +15,9 @@ data class CoinDetailState(
     val hasError: String?
         get() = errorMessage
 }
+
+data class CoinDetailState(
+    val priceUsd: BigDecimal,
+    val time: Long,
+)
+

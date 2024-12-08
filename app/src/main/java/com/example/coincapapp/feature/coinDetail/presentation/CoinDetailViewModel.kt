@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coincapapp.feature.coinDetail.domain.GetCoinCurrentPriceUseCase
 import com.example.coincapapp.feature.coinDetail.domain.GetCoinPriceHistoryUseCase
+import com.example.coincapapp.feature.coinDetail.domain.toState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -22,10 +23,10 @@ class CoinDetailViewModel @Inject constructor(
     private val historyUseCase: GetCoinPriceHistoryUseCase,
 ) : ViewModel() {
 
-    private val mutableCoinState: MutableStateFlow<CoinDetailState> = MutableStateFlow(
-        CoinDetailState("", "", BigDecimal("0.0"), emptyList())
+    private val mutableCoinState: MutableStateFlow<CoinDetailScreenState> = MutableStateFlow(
+        CoinDetailScreenState("", "", BigDecimal("0.0"), emptyList())
     )
-    val coinState: StateFlow<CoinDetailState> = mutableCoinState.asStateFlow()
+    val coinState: StateFlow<CoinDetailScreenState> = mutableCoinState.asStateFlow()
 
     private val mutableActions: Channel<CoinDetailEvent> = Channel()
     val action: Flow<CoinDetailEvent> = mutableActions.receiveAsFlow()
@@ -72,7 +73,7 @@ class CoinDetailViewModel @Inject constructor(
                         coinPriceHistory = emptyList(),
                         errorMessage = null
                     )
-                val history = historyUseCase(coinId = coinId).data.map { it.priceUsd }
+                val history = historyUseCase(coinId = coinId).map { it.toState() }
 
                 mutableCoinState.value = coinState.value.copy(
                     coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
@@ -83,9 +84,9 @@ class CoinDetailViewModel @Inject constructor(
 
                 currentPriceUseCase(coinId).collect { price ->
                     mutableCoinState.value = coinState.value.copy(
-                        currentPrice = price.toBigDecimal(),
+                        currentPrice = price.priceUsd,
                         coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                            .apply { add(price.toBigDecimal()) })
+                            .apply { add(price.toState()) })
                 }
             } catch (ex: Exception) {
                 mutableCoinState.value = coinState.value.copy(
