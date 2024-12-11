@@ -8,8 +8,10 @@ class GetCoinPriceHistoryUseCaseImpl @Inject constructor(
     private val repository: CoinDetailRepository
 ) : GetCoinPriceHistoryUseCase {
 
-    override suspend fun invoke(coinId: String): List<CoinDetailEntity> =
-        repository.getCoinPricesHistory(coinId).data.mapIndexed { index, it ->
+    override suspend fun invoke(coinId: String): List<CoinDetailEntity> {
+        println(repository.getCoinPricesHistory(coinId).data)
+        return repository.getCoinPricesHistory(coinId).data.mapIndexed { index, it ->
             it.toEntity(index)
         }
+    }
 }

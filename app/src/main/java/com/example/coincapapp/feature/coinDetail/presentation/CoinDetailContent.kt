@@ -1,24 +1,28 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
+import android.graphics.RectF
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,9 +38,6 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.github.tehras.charts.line.LineChart
-import com.github.tehras.charts.line.LineChartData
-import com.github.tehras.charts.line.renderer.line.SolidLineDrawer
 import java.math.BigDecimal
 
 @Composable
@@ -63,7 +64,6 @@ fun CoinDetailContent(
                     fontWeight = FontWeight.Bold
                 )
                 when {
-
                     state.isLoading -> {
                         LoadingState(Modifier.fillMaxSize())
                     }
@@ -86,7 +86,7 @@ fun CoinDetailContent(
                     }
 
                     state.coinPriceHistory.isNotEmpty() -> {
-                        Chart2(state)
+                        Chart(state)
                     }
                 }
 
@@ -110,39 +110,20 @@ fun CoinDetailTopAppBar(
     })
 }
 
+
 @Composable
 fun Chart(state: CoinDetailScreenState) {
-    val lineChartData = listOf(LineChartData(points = state.coinPriceHistory.map {
-        LineChartData.Point(it.priceUsd.toFloat(), "")
-    }, lineDrawer = SolidLineDrawer()))
-    LineChart(
-        modifier = Modifier
-            .fillMaxSize()
-            .width(1600.dp)
-            .padding(vertical = 32.dp),
-        linesChartData = lineChartData,
-        horizontalOffset = 5f,
-    )
-}
-
-
-@Composable
-fun Chart2(state: CoinDetailScreenState) {
     println(state.coinPriceHistory.reversed())
     LineGraph(
         yData = state.coinPriceHistory.map { it.priceUsd },
-//        xData = (0..state.coinPriceHistory.size).toList().map { it.toFloat() },
         xData = state.coinPriceHistory.map { it.xValue },
         dataLabel = "${state.coinName} price",
         xLabels = state.coinPriceHistory.map { it.time },
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp, vertical = 32.dp),
-
-        )
+    )
 }
-
-
 
 @Composable
 fun LineGraph(
@@ -150,74 +131,81 @@ fun LineGraph(
     yData: List<Float>,
     xLabels: List<String>,
     dataLabel: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
-    var currentXPosition by remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
+    var currentViewport by remember { mutableStateOf(RectF()) }
+    var currentXPosition by remember { mutableFloatStateOf(0f) }
+    val color = MaterialTheme.colorScheme.primary.toArgb()
     AndroidView(
         modifier = modifier.fillMaxSize(),
         factory = { context ->
             val chart = LineChart(context)
-            val entries: List<Entry> =
-                xData.zip(yData) { x, y -> Entry(x, y) }
-            println(entries)
-            println(entries.size)
-            val dataSet = LineDataSet(entries, dataLabel).apply {
-                lineWidth = 4f
-                circleRadius = 6f
-            }
-            chart.data = LineData(dataSet)
-            currentXPosition = if (xData.size > 3) {
-                xData.size - 3.toFloat()
-            } else {
-                0f
-            }
-            chart.setExtraOffsets(10f, 10f, 10f, 10f)
-            chart.setTouchEnabled(true)
-            chart.isDragEnabled = true
-            chart.description.isEnabled = false
-            chart.isScaleXEnabled = false
-            chart.axisLeft.isEnabled = false
-            chart.isScaleYEnabled = false
-            chart.xAxis.setDrawGridLines(false)
-            chart.xAxis.valueFormatter = IndexAxisValueFormatter(xLabels)
-            chart.invalidate()
+            setupChart(chart, xData, yData, dataLabel, color, xLabels)
+            currentXPosition = calculateCurrentXPosition(xData.size)
+            chart.moveViewToX(currentXPosition)
             chart
         },
         update = { view ->
-            val entries: List<Entry> =
-                xData.zip(yData) { x, y -> Entry(x, y) }
-            val dataSet = LineDataSet(entries, dataLabel).apply {
-                lineWidth = 4f
-                valueTextSize = 14f
-                circleRadius = 6f
-                valueFormatter = DecimalValueFormatter()
-            }
-            view.xAxis.valueFormatter = IndexAxisValueFormatter(xLabels)
-
-            view.xAxis.apply {
-                textSize = 12f
-                position = XAxis.XAxisPosition.BOTTOM
-            }
-
-            view.axisRight.apply {
-                textSize = 12f
-
-            }
-            view.data = LineData(dataSet)
-            view.setVisibleXRange(2f, 3f)
-            currentXPosition = if (xData.size > 3) {
-                xData.size - 3.toFloat()
-            } else {
-                0f
-            }
+            setupChart(view, xData, yData, dataLabel, color, xLabels)
+            currentXPosition = calculateCurrentXPosition(xData.size)
             view.moveViewToX(currentXPosition)
-            view.invalidate()
         }
     )
 }
 
 
+fun setupChart(
+    chart: LineChart,
+    xData: List<Float>,
+    yData: List<Float>,
+    dataLabel: String,
+    chartColor: Int,
+    xLabels: List<String>,
+) {
+    val entries: List<Entry> = xData.zip(yData) { x, y -> Entry(x, y) }
+
+    val dataSet = LineDataSet(entries, dataLabel).apply {
+        lineWidth = 4f
+        circleRadius = 6f
+        color = chartColor
+        setCircleColor(chartColor)
+        valueTextSize = 14f
+        valueFormatter = DecimalValueFormatter()
+    }
+
+    chart.data = LineData(dataSet)
+    chart.setExtraOffsets(10f, 10f, 10f, 10f)
+    chart.setTouchEnabled(true)
+    chart.isDragEnabled = true
+    chart.description.isEnabled = false
+    chart.isScaleXEnabled = false
+    chart.axisLeft.isEnabled = false
+    chart.isScaleYEnabled = false
+    chart.xAxis.setDrawGridLines(false)
+    chart.xAxis.valueFormatter = IndexAxisValueFormatter(xLabels)
+    chart.legend.isEnabled = false
+
+    chart.xAxis.apply {
+        textSize = 12f
+        position = XAxis.XAxisPosition.BOTTOM
+    }
+
+    chart.axisRight.apply {
+        textSize = 12f
+    }
+
+    chart.setVisibleXRange(2f, 3f)
+    chart.invalidate()
+}
+
+
+fun calculateCurrentXPosition(size: Int): Float {
+    return if (size > 3) {
+        size - 3.toFloat()
+    } else {
+        0f
+    }
+}
 
 @Composable
 @Preview(showBackground = true)
