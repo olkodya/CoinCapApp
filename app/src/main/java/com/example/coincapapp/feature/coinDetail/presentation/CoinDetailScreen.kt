@@ -15,13 +15,14 @@ fun CoinDetailScreen(
 ) {
     val viewModel: CoinDetailViewModel = hiltViewModel()
     LaunchedEffect(Unit) {
-        viewModel.handleAction(
-            CoinDetailViewModel.CoinDetailAction.OnStart(
-                coinId = coinId,
-                coinName = coinName,
-                coinPrice = coinPrice,
+        if (viewModel.coinState.value.coinPriceHistory.isEmpty())
+            viewModel.handleAction(
+                CoinDetailViewModel.CoinDetailAction.OnStart(
+                    coinId = coinId,
+                    coinName = coinName,
+                    coinPrice = coinPrice,
+                )
             )
-        )
         viewModel.action.collect { action ->
             when (action) {
                 CoinDetailViewModel.CoinDetailEvent.GoBack -> routeBackStack()

@@ -1,5 +1,6 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
+import com.github.mikephil.charting.data.Entry
 import java.math.BigDecimal
 
 data class CoinDetailScreenState(
@@ -7,6 +8,7 @@ data class CoinDetailScreenState(
     val coinName: String,
     val currentPrice: BigDecimal,
     val coinPriceHistory: List<CoinDetailState> = emptyList(),
+    val currentChartPosition: Float,
     val loading: Boolean = false,
     val errorMessage: String? = null
 ) {
@@ -17,8 +19,6 @@ data class CoinDetailScreenState(
 }
 
 data class CoinDetailState(
-    val priceUsd: Float,
-    val xValue: Float,
     val time: String,
+    val data: Entry,
 )
-

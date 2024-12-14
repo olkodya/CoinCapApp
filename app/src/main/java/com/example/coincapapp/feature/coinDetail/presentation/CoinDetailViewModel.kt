@@ -24,12 +24,13 @@ class CoinDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val mutableCoinState: MutableStateFlow<CoinDetailScreenState> = MutableStateFlow(
-        CoinDetailScreenState("", "", BigDecimal("0.0"), emptyList())
+        CoinDetailScreenState("", "", BigDecimal("0.0"), emptyList(), 0f)
     )
     val coinState: StateFlow<CoinDetailScreenState> = mutableCoinState.asStateFlow()
 
     private val mutableActions: Channel<CoinDetailEvent> = Channel()
     val action: Flow<CoinDetailEvent> = mutableActions.receiveAsFlow()
+
 
     fun handleAction(action: CoinDetailAction) {
         when (action) {
@@ -45,7 +46,13 @@ class CoinDetailViewModel @Inject constructor(
                 action.coinName,
                 action.coinPrice
             )
+
+            is CoinDetailAction.OnChangePosition -> positionChanged(action.position)
         }
+    }
+
+    private fun positionChanged(position: Float) {
+        mutableCoinState.value = coinState.value.copy(currentChartPosition = position)
     }
 
     private fun navigateToCoinListScreen() {
@@ -123,6 +130,8 @@ class CoinDetailViewModel @Inject constructor(
             val coinName: String,
             val coinPrice: BigDecimal
         ) : CoinDetailAction()
+
+        data class OnChangePosition(val position: Float) : CoinDetailAction()
     }
 
     sealed class CoinDetailEvent {

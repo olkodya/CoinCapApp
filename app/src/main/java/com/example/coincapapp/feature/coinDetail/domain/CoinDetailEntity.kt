@@ -1,6 +1,7 @@
 package com.example.coincapapp.feature.coinDetail.domain
 
 import com.example.coincapapp.feature.coinDetail.presentation.CoinDetailState
+import com.github.mikephil.charting.data.Entry
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -18,8 +19,7 @@ fun CoinDetailEntity.toState(xValue: Float = xValues.toFloat()): CoinDetailState
     val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
     val formattedDate = formatter.format(calendar.time)
     return CoinDetailState(
-        priceUsd = priceUsd.toFloat(),
-        time = formattedDate.toString(),
-        xValue = xValue
+        data = Entry(xValue, priceUsd.toFloat()),
+        time = formattedDate
     )
 }

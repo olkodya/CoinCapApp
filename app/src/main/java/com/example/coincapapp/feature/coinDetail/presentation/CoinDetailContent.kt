@@ -1,6 +1,5 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
-import android.graphics.RectF
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,11 +14,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -86,7 +80,7 @@ fun CoinDetailContent(
                     }
 
                     state.coinPriceHistory.isNotEmpty() -> {
-                        Chart(state)
+                        Chart(state, handleAction)
                     }
                 }
 
@@ -112,43 +106,66 @@ fun CoinDetailTopAppBar(
 
 
 @Composable
-fun Chart(state: CoinDetailScreenState) {
+fun Chart(
+    state: CoinDetailScreenState,
+    handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit
+) {
     println(state.coinPriceHistory.reversed())
     LineGraph(
-        yData = state.coinPriceHistory.map { it.priceUsd },
-        xData = state.coinPriceHistory.map { it.xValue },
+        data = ArrayList(state.coinPriceHistory.map { it.data }),
         dataLabel = "${state.coinName} price",
-        xLabels = state.coinPriceHistory.map { it.time },
+        xLabels = ArrayList(state.coinPriceHistory.map { it.time }),
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp, vertical = 32.dp),
+        position = state.currentChartPosition,
+        handleAction = handleAction
     )
 }
 
 @Composable
 fun LineGraph(
-    xData: List<Float>,
-    yData: List<Float>,
+    data: List<Entry>,
     xLabels: List<String>,
     dataLabel: String,
     modifier: Modifier = Modifier,
+    position: Float,
+    handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
 ) {
-    var currentViewport by remember { mutableStateOf(RectF()) }
-    var currentXPosition by remember { mutableFloatStateOf(0f) }
     val color = MaterialTheme.colorScheme.primary.toArgb()
     AndroidView(
         modifier = modifier.fillMaxSize(),
         factory = { context ->
             val chart = LineChart(context)
-            setupChart(chart, xData, yData, dataLabel, color, xLabels)
-            currentXPosition = calculateCurrentXPosition(xData.size)
-            chart.moveViewToX(currentXPosition)
+            setupChart(chart, data, dataLabel, color, xLabels)
+            val visibleEntries = chart.highestVisibleX
+            if (position != 0f) {
+                chart.moveViewToX(position - 3)
+            } else {
+                chart.moveViewToX(data.last().x)
+            }
+            val isAtEnd = visibleEntries >= data.size - 3
+
+            if (isAtEnd && data.isNotEmpty()) {
+                chart.moveViewToX(data.last().x)
+            }
+            handleAction(
+                CoinDetailViewModel.CoinDetailAction.OnChangePosition(visibleEntries)
+            )
+            chart.invalidate()
             chart
         },
         update = { view ->
-            setupChart(view, xData, yData, dataLabel, color, xLabels)
-            currentXPosition = calculateCurrentXPosition(xData.size)
-            view.moveViewToX(currentXPosition)
+            setupChart(view, data, dataLabel, color, xLabels)
+            val visibleEntries = view.highestVisibleX
+            val isAtEnd = visibleEntries >= data.size - 3
+            if (isAtEnd && data.isNotEmpty()) {
+                view.moveViewToX(data.last().x)
+            }
+            handleAction(
+                CoinDetailViewModel.CoinDetailAction.OnChangePosition(visibleEntries)
+            )
+            view.invalidate()
         }
     )
 }
@@ -156,15 +173,14 @@ fun LineGraph(
 
 fun setupChart(
     chart: LineChart,
-    xData: List<Float>,
-    yData: List<Float>,
+    data: List<Entry>,
     dataLabel: String,
     chartColor: Int,
     xLabels: List<String>,
-) {
-    val entries: List<Entry> = xData.zip(yData) { x, y -> Entry(x, y) }
 
-    val dataSet = LineDataSet(entries, dataLabel).apply {
+    ) {
+
+    val dataSet = LineDataSet(data, dataLabel).apply {
         lineWidth = 4f
         circleRadius = 6f
         color = chartColor
@@ -172,7 +188,6 @@ fun setupChart(
         valueTextSize = 14f
         valueFormatter = DecimalValueFormatter()
     }
-
     chart.data = LineData(dataSet)
     chart.setExtraOffsets(10f, 10f, 10f, 10f)
     chart.setTouchEnabled(true)
@@ -187,25 +202,18 @@ fun setupChart(
 
     chart.xAxis.apply {
         textSize = 12f
+        spaceMax = 0.5f
         position = XAxis.XAxisPosition.BOTTOM
     }
 
     chart.axisRight.apply {
         textSize = 12f
+        spaceMax = 40f
     }
-
-    chart.setVisibleXRange(2f, 3f)
-    chart.invalidate()
+    chart.axisRight.setDrawGridLines(true)
+    chart.setVisibleXRange(3f, 3f)
 }
 
-
-fun calculateCurrentXPosition(size: Int): Float {
-    return if (size > 3) {
-        size - 3.toFloat()
-    } else {
-        0f
-    }
-}
 
 @Composable
 @Preview(showBackground = true)
@@ -214,14 +222,15 @@ fun CoinDetailChartPreview() {
         coinId = "bitcoin",
         coinName = "Bitcoin",
         coinPriceHistory = listOf(
-            CoinDetailState(95000.43F, 0F, "00:38:00"),
-            CoinDetailState(95000.41F, 1F, "00:38:05"),
-            CoinDetailState(95001.43F, 2F, "00:38:10"),
-            CoinDetailState(95001.02F, 3F, "00:38:15"),
+            CoinDetailState(data = Entry(0F, 95000.43F), time = "00:38:00"),
+            CoinDetailState(data = Entry(1F, 95000.41F), time = "00:38:05"),
+            CoinDetailState(data = Entry(2F, 95001.43F), time = "00:38:10"),
+            CoinDetailState(data = Entry(3F, 95001.02F), time = "00:38:15"),
         ),
         currentPrice = BigDecimal("95000.0"),
         loading = false,
-        errorMessage = null
+        errorMessage = null,
+        currentChartPosition = 3f
     )
     CoinDetailContent(state) {}
 }
@@ -235,7 +244,8 @@ fun CoinDetailErrorStatePreview() {
         coinPriceHistory = emptyList(),
         currentPrice = BigDecimal("95000.0"),
         loading = false,
-        errorMessage = "Error"
+        errorMessage = "Error",
+        currentChartPosition = 0f
     )
     CoinDetailContent(state) {}
 }
@@ -249,7 +259,8 @@ fun CoinDetailLoadingStatePreview() {
         coinPriceHistory = emptyList(),
         currentPrice = BigDecimal("95000.0"),
         loading = true,
-        errorMessage = null
+        errorMessage = null,
+        currentChartPosition = 0f
     )
     CoinDetailContent(state) {}
 }
