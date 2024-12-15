@@ -48,7 +48,36 @@ class CoinDetailViewModel @Inject constructor(
             )
 
             is CoinDetailAction.OnChangePosition -> positionChanged(action.position)
+
+            CoinDetailAction.OnEndButtonClicked -> endClicked()
+
+            CoinDetailAction.OnStartButtonClicked -> startClicked()
+
+            CoinDetailAction.OnMovedToStart -> setStartButtonClicked(false)
+
+            CoinDetailAction.OnMovedToEnd -> setEndButtonClicked(false)
         }
+    }
+
+    private fun startClicked() {
+        setStartButtonClicked(true)
+        positionChanged(0.0f)
+    }
+
+    fun setStartButtonClicked(isStartButtonClicked: Boolean) {
+        mutableCoinState.value = coinState.value.copy(startButtonClicked = isStartButtonClicked)
+
+    }
+
+
+    private fun endClicked() {
+        setEndButtonClicked(true)
+        positionChanged(coinState.value.coinPriceHistory.size.toFloat())
+    }
+
+    private fun setEndButtonClicked(isEndButtonClicked: Boolean) {
+        mutableCoinState.value = coinState.value.copy(endButtonClicked = isEndButtonClicked)
+
     }
 
     private fun positionChanged(position: Float) {
@@ -132,6 +161,15 @@ class CoinDetailViewModel @Inject constructor(
         ) : CoinDetailAction()
 
         data class OnChangePosition(val position: Float) : CoinDetailAction()
+
+        data object OnStartButtonClicked : CoinDetailAction()
+
+        data object OnEndButtonClicked : CoinDetailAction()
+
+        data object OnMovedToStart : CoinDetailAction()
+
+        data object OnMovedToEnd : CoinDetailAction()
+
     }
 
     sealed class CoinDetailEvent {

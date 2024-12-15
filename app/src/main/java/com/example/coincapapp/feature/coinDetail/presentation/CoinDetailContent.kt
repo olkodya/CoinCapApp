@@ -1,8 +1,11 @@
 package com.example.coincapapp.feature.coinDetail.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -17,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,11 +55,12 @@ fun CoinDetailContent(
             contentAlignment = Alignment.Center
         ) {
             Column(
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp)
+                modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    stringResource(R.string.current_price, state.currentPrice),
-                    fontWeight = FontWeight.Bold
+                    text = stringResource(R.string.current_price, state.currentPrice),
+                    fontWeight = FontWeight.Bold,
                 )
                 when {
                     state.isLoading -> {
@@ -80,11 +85,43 @@ fun CoinDetailContent(
                     }
 
                     state.coinPriceHistory.isNotEmpty() -> {
+                        ChartNavigationButtons(handleAction)
                         Chart(state, handleAction)
                     }
                 }
-
             }
+        }
+    }
+}
+
+
+@Composable
+fun ChartNavigationButtons(
+    handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        IconButton(
+            onClick = {
+                handleAction(CoinDetailViewModel.CoinDetailAction.OnStartButtonClicked)
+            },
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_arrow_back_24),
+                contentDescription = "Go to start of chart"
+            )
+        }
+        IconButton(
+            onClick = {
+                handleAction(CoinDetailViewModel.CoinDetailAction.OnEndButtonClicked)
+            },
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_arrow_forward_24),
+                contentDescription = "Go to end of chart"
+            )
         }
     }
 }
@@ -104,22 +141,22 @@ fun CoinDetailTopAppBar(
     })
 }
 
-
 @Composable
 fun Chart(
     state: CoinDetailScreenState,
     handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit
 ) {
-    println(state.coinPriceHistory.reversed())
     LineGraph(
         data = ArrayList(state.coinPriceHistory.map { it.data }),
         dataLabel = "${state.coinName} price",
         xLabels = ArrayList(state.coinPriceHistory.map { it.time }),
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp, vertical = 32.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         position = state.currentChartPosition,
-        handleAction = handleAction
+        handleAction = handleAction,
+        isStartClicked = state.startButtonClicked,
+        isEndClicked = state.endButtonClicked,
     )
 }
 
@@ -131,6 +168,8 @@ fun LineGraph(
     modifier: Modifier = Modifier,
     position: Float,
     handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit,
+    isStartClicked: Boolean,
+    isEndClicked: Boolean,
 ) {
     val color = MaterialTheme.colorScheme.primary.toArgb()
     AndroidView(
@@ -144,11 +183,6 @@ fun LineGraph(
             } else {
                 chart.moveViewToX(data.last().x)
             }
-            val isAtEnd = visibleEntries >= data.size - 3
-
-            if (isAtEnd && data.isNotEmpty()) {
-                chart.moveViewToX(data.last().x)
-            }
             handleAction(
                 CoinDetailViewModel.CoinDetailAction.OnChangePosition(visibleEntries)
             )
@@ -159,17 +193,29 @@ fun LineGraph(
             setupChart(view, data, dataLabel, color, xLabels)
             val visibleEntries = view.highestVisibleX
             val isAtEnd = visibleEntries >= data.size - 3
-            if (isAtEnd && data.isNotEmpty()) {
+
+            if (isStartClicked) {
+                view.moveViewToX(0F)
+                handleAction(CoinDetailViewModel.CoinDetailAction.OnMovedToStart)
+            }
+
+            if (isEndClicked) {
+                view.moveViewToX(data.last().x)
+                handleAction(CoinDetailViewModel.CoinDetailAction.OnMovedToEnd)
+            }
+
+            if (isAtEnd && data.isNotEmpty() && !isStartClicked && !isEndClicked) {
                 view.moveViewToX(data.last().x)
             }
-            handleAction(
-                CoinDetailViewModel.CoinDetailAction.OnChangePosition(visibleEntries)
-            )
+
+            if (!isStartClicked && !isEndClicked && !isAtEnd)
+                handleAction(
+                    CoinDetailViewModel.CoinDetailAction.OnChangePosition(visibleEntries)
+                )
             view.invalidate()
         }
     )
 }
-
 
 fun setupChart(
     chart: LineChart,
@@ -177,9 +223,7 @@ fun setupChart(
     dataLabel: String,
     chartColor: Int,
     xLabels: List<String>,
-
-    ) {
-
+) {
     val dataSet = LineDataSet(data, dataLabel).apply {
         lineWidth = 4f
         circleRadius = 6f
@@ -202,7 +246,6 @@ fun setupChart(
 
     chart.xAxis.apply {
         textSize = 12f
-        spaceMax = 0.5f
         position = XAxis.XAxisPosition.BOTTOM
     }
 
@@ -213,7 +256,6 @@ fun setupChart(
     chart.axisRight.setDrawGridLines(true)
     chart.setVisibleXRange(3f, 3f)
 }
-
 
 @Composable
 @Preview(showBackground = true)

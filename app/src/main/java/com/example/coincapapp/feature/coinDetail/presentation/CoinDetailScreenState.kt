@@ -10,7 +10,9 @@ data class CoinDetailScreenState(
     val coinPriceHistory: List<CoinDetailState> = emptyList(),
     val currentChartPosition: Float,
     val loading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val startButtonClicked: Boolean = false,
+    val endButtonClicked: Boolean = false
 ) {
     val isLoading: Boolean
         get() = loading
