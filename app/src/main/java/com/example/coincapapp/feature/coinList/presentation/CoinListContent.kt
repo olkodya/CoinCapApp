@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinListContent(
     fieldState: String,
@@ -58,69 +61,74 @@ fun CoinListContent(
             singleLine = true,
         )
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            if (coinsPagingState.itemCount == 0 &&
-                coinsPagingState.loadState.refresh !is LoadState.Error &&
-                coinsPagingState.loadState.refresh !is LoadState.Loading
-            ) {
-                item {
-                    EmptyState(
-                        modifier = Modifier.fillParentMaxSize(),
-                        message = stringResource(R.string.empty_coins),
-                    )
-                }
-            } else {
-                items(
-                    count = coinsPagingState.itemCount,
-                    key = { index ->
-                        coinsPagingState[index]?.id ?: index
-                    }
-                ) { index ->
-                    val coinState = coinsPagingState[index]
-                    coinState?.let { coin ->
-                        CoinCard(
-                            coin = coin,
-                            onCoinClick = {
-                                handleAction(
-                                    CoinListViewModel.CoinListAction.OnCoinClicked(
-                                        coinId = coin.id,
-                                        coinName = coin.name,
-                                        price = coin.priceUsd,
-                                    )
-                                )
-                            },
+        PullToRefreshBox(
+            isRefreshing = (coinsPagingState.loadState.refresh is LoadState.Loading && coinsPagingState.itemCount != 0),
+            onRefresh = { coinsPagingState.refresh() }
+        ) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                if (coinsPagingState.itemCount == 0 &&
+                    coinsPagingState.loadState.refresh !is LoadState.Error &&
+                    coinsPagingState.loadState.refresh !is LoadState.Loading
+                ) {
+                    item {
+                        EmptyState(
+                            modifier = Modifier.fillParentMaxSize(),
+                            message = stringResource(R.string.empty_coins),
                         )
                     }
-                }
-            }
-
-            coinsPagingState.apply {
-                when {
-                    loadState.refresh is LoadState.Loading -> {
-                        item { LoadingState(modifier = Modifier.fillParentMaxSize()) }
-                    }
-
-                    loadState.append is LoadState.Loading -> item { LoadingPagingItem() }
-                    loadState.refresh is LoadState.Error -> {
-                        val e = coinsPagingState.loadState.refresh as LoadState.Error
-                        item {
-                            ErrorState(
-                                message = e.error.localizedMessage
-                                    ?: stringResource(R.string.error_string),
-                                modifier = Modifier.fillParentMaxSize(),
-                                onRetryClick = { retry() }
+                } else {
+                    items(
+                        count = coinsPagingState.itemCount,
+                        key = { index ->
+                            coinsPagingState[index]?.id ?: index
+                        }
+                    ) { index ->
+                        val coinState = coinsPagingState[index]
+                        coinState?.let { coin ->
+                            CoinCard(
+                                coin = coin,
+                                onCoinClick = {
+                                    handleAction(
+                                        CoinListViewModel.CoinListAction.OnCoinClicked(
+                                            coinId = coin.id,
+                                            coinName = coin.name,
+                                            price = coin.priceUsd,
+                                        )
+                                    )
+                                },
                             )
                         }
                     }
+                }
 
-                    loadState.append is LoadState.Error -> {
-                        val error = coinsPagingState.loadState.append as LoadState.Error
-                        item {
-                            ErrorPagingItem(
-                                message = error.error.localizedMessage
-                                    ?: stringResource(R.string.error_string),
-                                onClickRetry = { retry() }
-                            )
+                coinsPagingState.apply {
+                    when {
+                        loadState.refresh is LoadState.Loading -> {
+                            item { LoadingState(modifier = Modifier.fillParentMaxSize()) }
+                        }
+
+                        loadState.append is LoadState.Loading -> item { LoadingPagingItem() }
+                        loadState.refresh is LoadState.Error -> {
+                            val e = coinsPagingState.loadState.refresh as LoadState.Error
+                            item {
+                                ErrorState(
+                                    message = e.error.localizedMessage
+                                        ?: stringResource(R.string.error_string),
+                                    modifier = Modifier.fillParentMaxSize(),
+                                    onRetryClick = { retry() }
+                                )
+                            }
+                        }
+
+                        loadState.append is LoadState.Error -> {
+                            val error = coinsPagingState.loadState.append as LoadState.Error
+                            item {
+                                ErrorPagingItem(
+                                    message = error.error.localizedMessage
+                                        ?: stringResource(R.string.error_string),
+                                    onClickRetry = { retry() }
+                                )
+                            }
                         }
                     }
                 }

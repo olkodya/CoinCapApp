@@ -26,6 +26,6 @@ fun CoinListScreen(
     CoinListContent(
         fieldState = viewModel.fieldState.collectAsState().value,
         coinsPagingState = viewModel.coinsPagingState.collectAsLazyPagingItems(),
-        handleAction = { viewModel.handleAction(it) }
+        handleAction = { viewModel.handleAction(it) },
     )
 }
