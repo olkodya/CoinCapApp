@@ -72,10 +72,17 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
 
     implementation(libs.ktor.client.serialization.jvm)
+    implementation(libs.ktor.client.logging)
 
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
     implementation(libs.kotlinx.collections.immutable)
+
+    implementation(libs.charts)
+
+
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
 
 }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
@@ -55,7 +56,13 @@ class CoinListViewModel @Inject constructor(
             is CoinListAction.OnSearchFieldEdited -> fieldChanged(action.query)
             is CoinListAction.OnCoinClicked -> {
                 viewModelScope.launch {
-                    mutableActions.send(CoinListEvent.NavigateToCoinDetail(action.coinId))
+                    mutableActions.send(
+                        CoinListEvent.NavigateToCoinDetail(
+                            action.coinId,
+                            action.coinName,
+                            action.price
+                        )
+                    )
                 }
             }
         }
@@ -79,10 +86,18 @@ class CoinListViewModel @Inject constructor(
 
     sealed class CoinListAction {
         data class OnSearchFieldEdited(val query: String) : CoinListAction()
-        data class OnCoinClicked(val coinId: String) : CoinListAction()
+        data class OnCoinClicked(
+            val coinId: String,
+            val coinName: String,
+            val price: BigDecimal,
+        ) : CoinListAction()
     }
 
     sealed class CoinListEvent {
-        data class NavigateToCoinDetail(val coinId: String) : CoinListEvent()
+        data class NavigateToCoinDetail(
+            val coinId: String,
+            val coinName: String,
+            val price: BigDecimal,
+        ) : CoinListEvent()
     }
 }

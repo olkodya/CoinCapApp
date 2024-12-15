@@ -81,7 +81,13 @@ fun CoinListContent(
                         CoinCard(
                             coin = coin,
                             onCoinClick = {
-                                handleAction(CoinListViewModel.CoinListAction.OnCoinClicked(coin.id))
+                                handleAction(
+                                    CoinListViewModel.CoinListAction.OnCoinClicked(
+                                        coinId = coin.id,
+                                        coinName = coin.name,
+                                        price = coin.priceUsd,
+                                    )
+                                )
                             },
                         )
                     }

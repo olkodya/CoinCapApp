@@ -12,5 +12,6 @@
     <string name="volumeUsd" translatable="true"> Объем торгов: %.5f %s</string>
     <string name="percentTotalVolume" translatable="true"> Процент от общего объема торгов: %.5f %s</string>
     <string name="exchangeUrl" translatable="true"> Exchange URL: %s</string>
+    <string name="current_price">Текущая стоимость: %1$s $</string>
 
 </resources>
