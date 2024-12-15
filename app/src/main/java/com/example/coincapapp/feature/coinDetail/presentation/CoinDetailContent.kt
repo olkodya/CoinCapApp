@@ -25,10 +25,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
+import com.example.coincapapp.ui.theme.DecreaseColor
+import com.example.coincapapp.ui.theme.IncreaseColor
 import com.example.coincapapp.utils.DecimalValueFormatter
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -61,6 +64,12 @@ fun CoinDetailContent(
                 Text(
                     text = stringResource(R.string.current_price, state.currentPrice),
                     fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = if (state.coinPriceIncreased) {
+                        IncreaseColor
+                    } else {
+                        DecreaseColor
+                    }
                 )
                 when {
                     state.isLoading -> {
@@ -306,4 +315,5 @@ fun CoinDetailLoadingStatePreview() {
     )
     CoinDetailContent(state) {}
 }
+
 

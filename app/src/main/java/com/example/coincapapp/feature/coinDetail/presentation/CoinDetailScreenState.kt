@@ -12,7 +12,8 @@ data class CoinDetailScreenState(
     val loading: Boolean = false,
     val errorMessage: String? = null,
     val startButtonClicked: Boolean = false,
-    val endButtonClicked: Boolean = false
+    val endButtonClicked: Boolean = false,
+    val coinPriceIncreased: Boolean = true
 ) {
     val isLoading: Boolean
         get() = loading

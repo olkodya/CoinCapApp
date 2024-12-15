@@ -8,7 +8,7 @@
     <string name="empty_coins">Монеты не найдены</string>
     <string name="symbol">Код %1$s</string>
     <string name="price">Цена: %1$s %2$s</string>
-    <string name="percent24hr">Процент за 24 часа: %1$s %2$s</string>
+    <string name="percent24hr_title">Процент за 24 часа: %1$s %2$s</string>
     <string name="volumeUsd" translatable="true"> Объем торгов: %.5f %s</string>
     <string name="percentTotalVolume" translatable="true"> Процент от общего объема торгов: %.5f %s</string>
     <string name="exchangeUrl" translatable="true"> Exchange URL: %s</string>

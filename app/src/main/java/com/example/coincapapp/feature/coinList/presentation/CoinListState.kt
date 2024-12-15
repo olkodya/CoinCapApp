@@ -13,6 +13,7 @@ data class CoinState(
     val name: String,
     val priceUsd: BigDecimal,
     val changePercent24Hr: BigDecimal,
+    val isPercentPositive: Boolean,
 )
 
 fun CoinEntity.toState() = CoinState(
@@ -21,5 +22,6 @@ fun CoinEntity.toState() = CoinState(
     symbol = symbol,
     name = name,
     priceUsd = priceUsd,
-    changePercent24Hr = changePercent24Hr
+    changePercent24Hr = changePercent24Hr,
+    isPercentPositive = changePercent24Hr >= BigDecimal("0.0")
 )

@@ -35,6 +35,8 @@ import com.example.coincapapp.R
 import com.example.coincapapp.components.EmptyState
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
+import com.example.coincapapp.ui.theme.DecreaseColor
+import com.example.coincapapp.ui.theme.IncreaseColor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
@@ -202,13 +204,24 @@ private fun CoinCard(onCoinClick: () -> Unit, coin: CoinState) {
                     stringResource(R.string.usd)
                 )
             )
-            Text(
-                text = stringResource(R.string.percent24hr)
-                    .format(
-                        coin.changePercent24Hr,
-                        stringResource(R.string.percent),
-                    )
-            )
+            Row {
+                Text(
+                    modifier = Modifier.padding(end = 8.dp),
+                    text = stringResource(R.string.percent24hr_title)
+                )
+                Text(
+                    text = stringResource(R.string.percent24hr)
+                        .format(
+                            coin.changePercent24Hr,
+                            stringResource(R.string.percent),
+                        ),
+                    color = if (coin.isPercentPositive) {
+                        IncreaseColor
+                    } else {
+                        DecreaseColor
+                    }
+                )
+            }
         }
     }
 }
@@ -225,7 +238,8 @@ fun CoinCardPreview() {
             symbol = "BTC",
             name = "Bitcoin",
             priceUsd = BigDecimal("90387.50000"),
-            changePercent24Hr = BigDecimal("1.00000")
+            changePercent24Hr = BigDecimal("1.00000"),
+            isPercentPositive = true
         )
     )
 }
@@ -257,6 +271,7 @@ fun rememberMockCoinsPagingItems(): LazyPagingItems<CoinState> {
                     name = "Bitcoin",
                     priceUsd = BigDecimal("90387.50000"),
                     changePercent24Hr = BigDecimal("1.0000000"),
+                    isPercentPositive = true
                 ),
                 CoinState(
                     id = "bitcoin-cash",
@@ -265,6 +280,7 @@ fun rememberMockCoinsPagingItems(): LazyPagingItems<CoinState> {
                     name = "Bitcoin Cash",
                     priceUsd = BigDecimal("449.11382"),
                     changePercent24Hr = BigDecimal("3.32509"),
+                    isPercentPositive = true
                 )
             )
         )

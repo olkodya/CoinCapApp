@@ -125,7 +125,8 @@ class CoinDetailViewModel @Inject constructor(
                         coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
                             .apply { add(price.toState(coinState.value.coinPriceHistory.size.toFloat())) },
                         loading = false,
-                        errorMessage = null
+                        errorMessage = null,
+                        coinPriceIncreased = price.priceUsd > coinState.value.currentPrice
                     )
                 }
             } catch (ex: Exception) {
