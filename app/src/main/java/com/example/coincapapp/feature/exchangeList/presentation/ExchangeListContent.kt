@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.coincapapp.R
 import com.example.coincapapp.components.ErrorState
 import com.example.coincapapp.components.LoadingState
@@ -112,21 +113,30 @@ fun ExchangeCard(
             Row {
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
-                    text = stringResource(R.string.hashtag).format(exchange.rank)
+                    text = stringResource(R.string.hashtag).format(exchange.rank),
+                    fontSize = 16.sp
                 )
-                Text(text = exchange.name, fontWeight = FontWeight.Bold)
+                Text(
+                    text = exchange.name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
             }
             Text(
+                modifier = Modifier.padding(top = 8.dp),
                 text = stringResource(R.string.volumeUsd).format(
                     exchange.volumeUsd,
                     stringResource(R.string.usd)
-                )
+                ),
+                fontSize = 16.sp,
             )
             Text(
+                modifier = Modifier.padding(top = 4.dp),
                 text = stringResource(R.string.percentTotalVolume).format(
                     exchange.percentTotalVolume,
                     stringResource(R.string.percent)
-                )
+                ),
+                fontSize = 16.sp
             )
         }
     }

@@ -185,11 +185,12 @@ private fun CoinCard(onCoinClick: () -> Unit, coin: CoinState) {
                 onCoinClick()
             }
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row {
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
-                    text = stringResource(R.string.hashtag).format(coin.rank)
+                    text = stringResource(R.string.hashtag).format(coin.rank),
+                    fontSize = 16.sp,
                 )
                 Text(
                     text = coin.name,
@@ -197,29 +198,39 @@ private fun CoinCard(onCoinClick: () -> Unit, coin: CoinState) {
                     fontSize = 16.sp,
                 )
             }
-            Text(text = stringResource(R.string.symbol).format(coin.symbol))
             Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = stringResource(R.string.symbol).format(coin.symbol),
+                fontSize = 16.sp,
+            )
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
                 text = stringResource(R.string.price).format(
                     coin.priceUsd,
                     stringResource(R.string.usd)
-                )
+                ),
+                fontSize = 16.sp,
             )
             Row {
                 Text(
-                    modifier = Modifier.padding(end = 8.dp),
-                    text = stringResource(R.string.percent24hr_title)
+                    modifier = Modifier.padding(end = 8.dp, top = 4.dp),
+                    text = stringResource(R.string.percent24hr_title),
+                    fontSize = 16.sp,
                 )
                 Text(
+                    modifier = Modifier.padding(top = 4.dp),
                     text = stringResource(R.string.percent24hr)
                         .format(
                             coin.changePercent24Hr,
                             stringResource(R.string.percent),
                         ),
+                    fontWeight = FontWeight.Bold,
                     color = if (coin.isPercentPositive) {
                         IncreaseColor
                     } else {
                         DecreaseColor
-                    }
+                    },
+                    fontSize = 16.sp,
                 )
             }
         }

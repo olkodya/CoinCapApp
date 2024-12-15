@@ -181,11 +181,12 @@ fun LineGraph(
     isEndClicked: Boolean,
 ) {
     val color = MaterialTheme.colorScheme.primary.toArgb()
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
     AndroidView(
         modifier = modifier.fillMaxSize(),
         factory = { context ->
             val chart = LineChart(context)
-            setupChart(chart, data, dataLabel, color, xLabels)
+            setupChart(chart, data, dataLabel, color, onSurfaceColor, xLabels)
             val visibleEntries = chart.highestVisibleX
             if (position != 0f) {
                 chart.moveViewToX(position - 3)
@@ -199,7 +200,7 @@ fun LineGraph(
             chart
         },
         update = { view ->
-            setupChart(view, data, dataLabel, color, xLabels)
+            setupChart(view, data, dataLabel, color, onSurfaceColor, xLabels)
             val visibleEntries = view.highestVisibleX
             val isAtEnd = visibleEntries >= data.size - 3
 
@@ -231,6 +232,7 @@ fun setupChart(
     data: List<Entry>,
     dataLabel: String,
     chartColor: Int,
+    onSurfaceColor: Int,
     xLabels: List<String>,
 ) {
     val dataSet = LineDataSet(data, dataLabel).apply {
@@ -239,6 +241,7 @@ fun setupChart(
         color = chartColor
         setCircleColor(chartColor)
         valueTextSize = 14f
+        valueTextColor = onSurfaceColor
         valueFormatter = DecimalValueFormatter()
     }
     chart.data = LineData(dataSet)
@@ -250,6 +253,8 @@ fun setupChart(
     chart.axisLeft.isEnabled = false
     chart.isScaleYEnabled = false
     chart.xAxis.setDrawGridLines(false)
+    chart.xAxis.axisLineColor = onSurfaceColor
+    chart.xAxis.textColor = onSurfaceColor
     chart.xAxis.valueFormatter = IndexAxisValueFormatter(xLabels)
     chart.legend.isEnabled = false
 
@@ -263,6 +268,9 @@ fun setupChart(
         spaceMax = 40f
     }
     chart.axisRight.setDrawGridLines(true)
+    chart.axisRight.axisLineColor = onSurfaceColor
+    chart.axisRight.textColor = onSurfaceColor
+    chart.axisRight.gridColor = onSurfaceColor
     chart.setVisibleXRange(3f, 3f)
 }
 
