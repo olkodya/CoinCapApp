@@ -10,6 +10,7 @@ sealed class ExchangeListState {
     @Immutable
     data class Content(
         val exchanges: ImmutableList<ExchangeState>,
+        val isRefreshing: Boolean = false,
     ) : ExchangeListState()
 
     data object Loading : ExchangeListState()

@@ -12,7 +12,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -60,18 +62,30 @@ fun ExchangesTopAppBar() {
     TopAppBar(title = { Text(text = "Exchanges List") })
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExchangeList(
     value: ExchangeListState,
     handleAction: (ExchangeListViewModel.ExchangeListAction) -> Unit
 ) {
     if (value is ExchangeListState.Content) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(count = value.exchanges.size, key = { id -> value.exchanges[id].id }) { index ->
-                val exchange = value.exchanges[index]
-                ExchangeCard(exchange = exchange, handleAction = handleAction)
+        PullToRefreshBox(
+            isRefreshing = value.isRefreshing,
+            onRefresh = { handleAction(ExchangeListViewModel.ExchangeListAction.OnSwipeToRefresh) },
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                items(
+                    count = value.exchanges.size,
+                    key = { id -> value.exchanges[id].id }) { index ->
+                    val exchange = value.exchanges[index]
+                    ExchangeCard(exchange = exchange, handleAction = handleAction)
+                }
             }
-
         }
     }
 }

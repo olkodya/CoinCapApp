@@ -34,6 +34,7 @@ class ExchangeListViewModel @Inject constructor(
         when (action) {
             is ExchangeListAction.OnExchangeUrlClicked -> openUrlInBrowser(action.exchangeUrl)
             ExchangeListAction.OnRetryClick -> loadExchanges()
+            ExchangeListAction.OnSwipeToRefresh -> loadExchanges(true)
         }
     }
 
@@ -45,15 +46,23 @@ class ExchangeListViewModel @Inject constructor(
         }
     }
 
-    private fun loadExchanges() {
+    private fun loadExchanges(pullToRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                mutableExchangeListState.value = ExchangeListState.Loading
+                if (!pullToRefresh)
+                    mutableExchangeListState.value = ExchangeListState.Loading
+                else
+                    mutableExchangeListState.value =
+                        (exchangeListState.value as ExchangeListState.Content).copy(isRefreshing = true)
                 val exchanges: List<ExchangeState> = getExchangeListUseCase().map {
                     it.toState()
                 }
                 mutableExchangeListState.value =
-                    ExchangeListState.Content(exchanges = exchanges.toImmutableList())
+                    ExchangeListState.Content(
+                        exchanges = exchanges.toImmutableList(),
+                        isRefreshing = false
+                    )
+                println(exchanges)
             } catch (ex: Exception) {
                 mutableExchangeListState.value = ExchangeListState.Error(message = ex.message)
             }
@@ -63,6 +72,7 @@ class ExchangeListViewModel @Inject constructor(
     sealed class ExchangeListAction {
         data class OnExchangeUrlClicked(val exchangeUrl: String) : ExchangeListAction()
         data object OnRetryClick : ExchangeListAction()
+        data object OnSwipeToRefresh : ExchangeListAction()
     }
 
     sealed class ExchangeListEvent {

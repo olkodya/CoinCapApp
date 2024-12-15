@@ -64,7 +64,7 @@ class CoinDetailViewModel @Inject constructor(
         positionChanged(0.0f)
     }
 
-    fun setStartButtonClicked(isStartButtonClicked: Boolean) {
+    private fun setStartButtonClicked(isStartButtonClicked: Boolean) {
         mutableCoinState.value = coinState.value.copy(startButtonClicked = isStartButtonClicked)
 
     }

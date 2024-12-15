@@ -24,6 +24,7 @@ fun ExchangeListScreen() {
         }
     }
 
+
     ExchangeListContent(
         exchangeListState = viewModel.exchangeListState.collectAsState().value,
         handleAction = { viewModel.handleAction(it) },
