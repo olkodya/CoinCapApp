@@ -6,6 +6,8 @@ import com.example.coincapapp.feature.coinDetail.domain.GetCoinCurrentPriceUseCa
 import com.example.coincapapp.feature.coinDetail.domain.GetCoinPriceHistoryUseCase
 import com.example.coincapapp.feature.coinDetail.domain.toState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,60 +26,26 @@ class CoinDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val mutableCoinState: MutableStateFlow<CoinDetailScreenState> = MutableStateFlow(
-        CoinDetailScreenState("", "", BigDecimal("0.0"), emptyList(), 0f)
+        CoinDetailScreenState("", "", BigDecimal("0.0"), persistentListOf(), 0f)
     )
     val coinState: StateFlow<CoinDetailScreenState> = mutableCoinState.asStateFlow()
 
     private val mutableActions: Channel<CoinDetailEvent> = Channel()
     val action: Flow<CoinDetailEvent> = mutableActions.receiveAsFlow()
 
-
     fun handleAction(action: CoinDetailAction) {
         when (action) {
             is CoinDetailAction.OnStart -> setCoin(
-                action.coinId,
-                action.coinName,
-                action.coinPrice
+                action.coinId, action.coinName, action.coinPrice
             )
 
             CoinDetailAction.OnBackClick -> navigateToCoinListScreen()
             is CoinDetailAction.OnRetryClick -> setCoin(
-                action.coinId,
-                action.coinName,
-                action.coinPrice
+                action.coinId, action.coinName, action.coinPrice
             )
 
             is CoinDetailAction.OnChangePosition -> positionChanged(action.position)
-
-            CoinDetailAction.OnEndButtonClicked -> endClicked()
-
-            CoinDetailAction.OnStartButtonClicked -> startClicked()
-
-            CoinDetailAction.OnMovedToStart -> setStartButtonClicked(false)
-
-            CoinDetailAction.OnMovedToEnd -> setEndButtonClicked(false)
         }
-    }
-
-    private fun startClicked() {
-        setStartButtonClicked(true)
-        positionChanged(0.0f)
-    }
-
-    private fun setStartButtonClicked(isStartButtonClicked: Boolean) {
-        mutableCoinState.value = coinState.value.copy(startButtonClicked = isStartButtonClicked)
-
-    }
-
-
-    private fun endClicked() {
-        setEndButtonClicked(true)
-        positionChanged(coinState.value.coinPriceHistory.size.toFloat())
-    }
-
-    private fun setEndButtonClicked(isEndButtonClicked: Boolean) {
-        mutableCoinState.value = coinState.value.copy(endButtonClicked = isEndButtonClicked)
-
     }
 
     private fun positionChanged(position: Float) {
@@ -91,48 +59,43 @@ class CoinDetailViewModel @Inject constructor(
     }
 
     private fun setCoin(coinId: String, coinName: String, price: BigDecimal) {
-        mutableCoinState.value =
-            coinState.value.copy(
-                coinId = coinId,
-                coinName = coinName,
-                currentPrice = price.setScale(5, RoundingMode.HALF_UP),
-            )
+        mutableCoinState.value = coinState.value.copy(
+            coinId = coinId,
+            coinName = coinName,
+            currentPrice = price.setScale(5, RoundingMode.HALF_UP),
+        )
         getCoinPriceHistory(coinId)
     }
 
     private fun getCoinPriceHistory(coinId: String) {
         viewModelScope.launch {
             try {
-                mutableCoinState.value =
-                    coinState.value.copy(
-                        loading = true,
-                        coinPriceHistory = emptyList(),
-                        errorMessage = null
-                    )
-                val history =
-                    historyUseCase(coinId = coinId)
+                mutableCoinState.value = coinState.value.copy(
+                    loading = true, coinPriceHistory = persistentListOf(), errorMessage = null
+                )
+                val history = historyUseCase(coinId = coinId)
 
                 mutableCoinState.value = coinState.value.copy(
                     coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                        .apply { addAll(history.map { it.toState() }) },
+                        .apply { addAll(history.map { it.toState() }) }
+                        .toImmutableList(),
                     loading = false,
                     errorMessage = null
                 )
 
                 currentPriceUseCase(coinId).collect { price ->
-                    mutableCoinState.value = coinState.value.copy(
-                        currentPrice = price.priceUsd,
+                    mutableCoinState.value = coinState.value.copy(currentPrice = price.priceUsd,
                         coinPriceHistory = coinState.value.coinPriceHistory.toMutableList()
-                            .apply { add(price.toState(coinState.value.coinPriceHistory.size.toFloat())) },
+                            .apply { add(price.toState(coinState.value.coinPriceHistory.size.toFloat())) }
+                            .toImmutableList(),
                         loading = false,
                         errorMessage = null,
-                        coinPriceIncreased = price.priceUsd > coinState.value.currentPrice
-                    )
+                        coinPriceIncreased = price.priceUsd > coinState.value.currentPrice)
                 }
             } catch (ex: Exception) {
                 mutableCoinState.value = coinState.value.copy(
                     loading = false,
-                    coinPriceHistory = emptyList(),
+                    coinPriceHistory = persistentListOf(),
                     errorMessage = ex.message.toString()
                 )
             }
@@ -149,27 +112,15 @@ class CoinDetailViewModel @Inject constructor(
 
     sealed class CoinDetailAction {
         data class OnStart(
-            val coinId: String,
-            val coinName: String,
-            val coinPrice: BigDecimal
+            val coinId: String, val coinName: String, val coinPrice: BigDecimal
         ) : CoinDetailAction()
 
         data object OnBackClick : CoinDetailAction()
         data class OnRetryClick(
-            val coinId: String,
-            val coinName: String,
-            val coinPrice: BigDecimal
+            val coinId: String, val coinName: String, val coinPrice: BigDecimal
         ) : CoinDetailAction()
 
         data class OnChangePosition(val position: Float) : CoinDetailAction()
-
-        data object OnStartButtonClicked : CoinDetailAction()
-
-        data object OnEndButtonClicked : CoinDetailAction()
-
-        data object OnMovedToStart : CoinDetailAction()
-
-        data object OnMovedToEnd : CoinDetailAction()
 
     }
 

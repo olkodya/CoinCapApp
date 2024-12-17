@@ -9,7 +9,8 @@ class DecimalValueFormatter : ValueFormatter() {
     private val format = DecimalFormat("#.###")
 
     override fun getPointLabel(entry: Entry?): String {
-        return format.format(entry?.y ?: 0f)
+
+        return if ((entry?.x ?: 0.0f) % 3 == 0.0f) format.format(entry?.y ?: 0f) else ""
     }
 
     override fun getAxisLabel(value: Float, axis: AxisBase?): String {
