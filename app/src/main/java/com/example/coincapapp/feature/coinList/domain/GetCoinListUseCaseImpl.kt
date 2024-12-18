@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.example.coincapapp.feature.coinList.data.CoinRepository
+import com.example.coincapapp.feature.coinList.domain.paging.CoinListPagingSource
 import com.example.coincapapp.feature.coinList.presentation.CoinState
 import com.example.coincapapp.feature.coinList.presentation.toState
 import kotlinx.coroutines.flow.Flow

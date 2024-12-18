@@ -1,4 +1,4 @@
-package com.example.coincapapp.feature.coinList.domain
+package com.example.coincapapp.feature.coinList.domain.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

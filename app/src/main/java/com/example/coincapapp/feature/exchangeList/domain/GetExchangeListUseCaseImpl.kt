@@ -10,13 +10,9 @@ class GetExchangeListUseCaseImpl @Inject constructor(
 ) : GetExchangeListUseCase {
 
     override suspend fun invoke(): List<ExchangeEntity> {
-        try {
-            val entities = repository.loadExchanges().data.map {
-                it.toEntity()
-            }
-            return entities
-        } catch (e: Exception) {
-            throw Exception()
+        val entities = repository.loadExchanges().data.map {
+            it.toEntity()
         }
+        return entities
     }
 }

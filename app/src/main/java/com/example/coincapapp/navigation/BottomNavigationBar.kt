@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
@@ -35,7 +36,7 @@ fun BottomNavigationBar(
 
         screens.forEach { screen ->
             NavigationBarItem(
-                label = { Text(text = screen.title) },
+                label = { Text(text = stringResource(screen.title)) },
                 selected = currentRoute == screen,
                 onClick = {
                     navController.navigate(screen) {
@@ -51,7 +52,7 @@ fun BottomNavigationBar(
                 icon = {
                     Icon(
                         painter = painterResource(id = screen.icon),
-                        contentDescription = screen.title
+                        contentDescription = stringResource(screen.title)
                     )
                 },
             )

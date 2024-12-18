@@ -16,5 +16,7 @@
     <string name="percentTotalVolume" translatable="true"> Total volume: %.5f %s</string>
     <string name="exchangeUrl" translatable="true"> Exchange URL: %s</string>
     <string name="current_price">%1$s $</string>
+    <string name="assets_title">Assets</string>
+    <string name="exchanges">Exchanges</string>
 
 </resources>

@@ -5,16 +5,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class BottomNavigationItem(
-    var icon: Int,
-    var title: String,
+    val icon: Int,
+    val title: Int,
 ) {
 
     @Serializable
     data object Coins :
-        BottomNavigationItem(R.drawable.assets_icon, "Assets")
+        BottomNavigationItem(R.drawable.assets_icon, R.string.assets_title)
 
     @Serializable
     data object Exchanges :
-        BottomNavigationItem(R.drawable.exchanges_icon, "Exchanges")
+        BottomNavigationItem(R.drawable.exchanges_icon, R.string.exchanges)
 }
 
