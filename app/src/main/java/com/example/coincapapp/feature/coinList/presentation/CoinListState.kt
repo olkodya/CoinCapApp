@@ -23,5 +23,5 @@ fun CoinEntity.toState() = CoinState(
     name = name,
     priceUsd = priceUsd,
     changePercent24Hr = changePercent24Hr,
-    isPercentPositive = changePercent24Hr >= BigDecimal("0.0")
+    isPercentPositive = changePercent24Hr >= BigDecimal.ZERO
 )

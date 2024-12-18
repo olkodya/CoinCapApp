@@ -50,8 +50,8 @@ fun CoinResponse.toEntity() = CoinEntity(
     maxSupply = requireNotNull(maxSupply ?: ""),
     marketCapUsd = requireNotNull(marketCapUsd ?: ""),
     volumeUsd24Hr = requireNotNull(volumeUsd24Hr ?: ""),
-    priceUsd = requireNotNull(priceUsd ?: BigDecimal("0.0")),
-    changePercent24Hr = requireNotNull(changePercent24Hr ?: BigDecimal("0.0")),
+    priceUsd = requireNotNull(priceUsd ?: BigDecimal.ZERO),
+    changePercent24Hr = requireNotNull(changePercent24Hr ?: BigDecimal.ZERO),
     vwap24Hr = requireNotNull(vwap24Hr ?: ""),
     explorer = requireNotNull(explorer ?: ""),
 )

@@ -6,5 +6,4 @@ import kotlinx.coroutines.flow.Flow
 interface CoinDetailRealtimeClient {
 
     suspend fun getCoinCurrentPrice(coinId: String): Flow<CoinDetailResponse>
-    suspend fun close()
 }

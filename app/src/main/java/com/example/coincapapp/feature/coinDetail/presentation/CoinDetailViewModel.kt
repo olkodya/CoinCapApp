@@ -26,7 +26,7 @@ class CoinDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val mutableCoinState: MutableStateFlow<CoinDetailScreenState> = MutableStateFlow(
-        CoinDetailScreenState("", "", BigDecimal("0.0"), persistentListOf(), 0f)
+        CoinDetailScreenState("", "", BigDecimal.ZERO, persistentListOf(), 0f)
     )
     val coinState: StateFlow<CoinDetailScreenState> = mutableCoinState.asStateFlow()
 
@@ -103,12 +103,6 @@ class CoinDetailViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.launch {
-            currentPriceUseCase.close()
-        }
-    }
 
     sealed class CoinDetailAction {
         data class OnStart(
