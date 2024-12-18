@@ -123,9 +123,9 @@ fun Chart(
     state: CoinDetailScreenState, handleAction: (CoinDetailViewModel.CoinDetailAction) -> Unit
 ) {
     LineGraph(
-        data = ArrayList(state.coinPriceHistory.map { it.data }),
+        data = state.coinPriceHistory.map { it.data },
         dataLabel = "${state.coinName} price",
-        xLabels = ArrayList(state.coinPriceHistory.mapIndexed { index, it -> if (index % 2 == 0) it.time else "" }),
+        xLabels = state.coinPriceHistory.mapIndexed { index, it -> if (index % 2 == 0) it.time else "" },
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp, vertical = 8.dp),
@@ -152,12 +152,9 @@ fun LineGraph(
         setupChart(lineChart, data, dataLabel, color, onSurfaceColor, xLabels) {}
         val visibleEntries = lineChart.highestVisibleX
         if (position != 0.0f) {
-            println(position)
             lineChart.moveViewToX(position - 9)
         } else {
             lineChart.moveViewToX(data.last().x)
-            println(data.last().x)
-            println("zalupa")
         }
         handleAction(
             CoinDetailViewModel.CoinDetailAction.OnChangePosition(visibleEntries)

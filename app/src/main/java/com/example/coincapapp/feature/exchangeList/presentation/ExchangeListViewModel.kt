@@ -62,7 +62,6 @@ class ExchangeListViewModel @Inject constructor(
                         exchanges = exchanges.toImmutableList(),
                         isRefreshing = false
                     )
-                println(exchanges)
             } catch (ex: Exception) {
                 mutableExchangeListState.value = ExchangeListState.Error(message = ex.message)
             }
